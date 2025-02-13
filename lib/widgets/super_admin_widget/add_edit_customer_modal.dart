@@ -207,7 +207,21 @@ void _submitCustomer() async {
 }
 
 
+// Function to handle adding new customer and addresses
+  Future<bool> _addCustomerAndAddress(Map<String, dynamic> customerData) async {
+    try {
+      // Add customer and capture the response which includes the customer ID
+      bool customerAdded = await AuthService().addNewCustomer(customerData);
+      print('Customer added response: $customerAdded');
+    
+      if (!customerAdded) return false;
 
+      return true;
+    } catch (e) {
+      print('Error adding customer and address: $e');
+      return false;
+    }
+  }
 
 // Function to handle editing customer and addresses
 Future<bool> _editCustomerAndAddress(String customerId, Map<String, dynamic> customerData) async {
@@ -227,42 +241,9 @@ Future<bool> _editCustomerAndAddress(String customerId, Map<String, dynamic> cus
       }
     }
 
-    
-
     return true;
   } catch (e) {
     print('Error during customer and address update: $e');
-    return false;
-  }
-}
-
-
-
-
-
-
-// Function to handle adding new customer and addresses
-Future<bool> _addCustomerAndAddress(Map<String, dynamic> customerData) async {
-  try {
-    // Add customer and capture the response which includes the customer ID
-    bool customerAdded = await AuthService().addNewCustomer(customerData);
-    print('Customer added response: $customerAdded');
-    
-    if (!customerAdded) return false;
-
-    // Ensure that the customerId is set correctly
-    String customerId = customerData['CustomerID'] ?? '';
-    
-    print('Customer ID: $customerId');
-    
-    // Add all addresses using the customerId
-    for (var address in addresses) {
-      await _addCustomerAddress(customerId, address);
-    }
-
-    return true;
-  } catch (e) {
-    print('Error adding customer and address: $e');
     return false;
   }
 }
@@ -279,7 +260,7 @@ Future<void> _addCustomerAddress(String customerId, Map<String, dynamic> address
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Address Added Successfully')));
     } else {
       print('Failed to add address');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add address')));
+        //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add address')));
     }
   } catch (e) {
     print('Error adding address: $e');
@@ -287,6 +268,8 @@ Future<void> _addCustomerAddress(String customerId, Map<String, dynamic> address
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage)));
   }
 }
+
+
 
 
 // Function to update address

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:water_management_system/services/auth_service.dart';
+import 'package:water_management_system/widgets/error_dialog.dart';
 
 class PrepaidTokenModal extends StatefulWidget {
   final Map<String, dynamic>? customerData;
@@ -27,7 +28,8 @@ class _PrepaidTokenModalState extends State<PrepaidTokenModal> {
   String? selectedCustomerId;
   int? editingIndex;
   bool _isLoading = true; // Track loading state
-  bool _showFields = false; // Initially hide fields
+  
+
 
   late TextEditingController _serialStartController;
   late TextEditingController _serialEndController;
@@ -47,7 +49,7 @@ class _PrepaidTokenModalState extends State<PrepaidTokenModal> {
         editingIndex = prepaidTokens.indexOf(lastToken);
       }
       selectedCustomerId = widget.customerId;
-      _showFields = true; // Show fields if editing
+    
     }
 
     _serialStartController = TextEditingController(
@@ -72,6 +74,12 @@ class _PrepaidTokenModalState extends State<PrepaidTokenModal> {
     );
 
     _fetchCustomers();
+
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   Future<void> _fetchCustomers() async {
@@ -108,6 +116,9 @@ class _PrepaidTokenModalState extends State<PrepaidTokenModal> {
       "numberoftokens": calculateNumberOfTokens(),
     };
 
+    print('Token Data: ${jsonEncode(tokenData)}'); // Debug log
+
+    try {
     bool success;
     if (widget.isEditing && editingIndex != null) {
       success = await _authService.updateToken(selectedCustomerId!, editingIndex!, tokenData);
@@ -117,10 +128,18 @@ class _PrepaidTokenModalState extends State<PrepaidTokenModal> {
 
     if (success) {
       Navigator.pop(context, true);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                'Token ${widget.isEditing ? 'Updated' : 'Added'} Successfully')));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to save token. Try again.")),
-      );
+            SnackBar(
+            content: Text(
+                'Failed to ${widget.isEditing ? 'update' : 'add'} token')));
+      }
+    } catch (e) {
+      final errorMessage = e.toString().replaceAll('Exception: ', '');
+      DialogUtil.showErrorMessage(context, errorMessage);
     }
   }
 
@@ -159,7 +178,7 @@ class _PrepaidTokenModalState extends State<PrepaidTokenModal> {
         onChanged: (value) {
           setState(() {
             selectedCustomerId = value;
-            _showFields = true; // Show fields after selecting a customer
+   
           });
         },
         validator: (value) {
@@ -172,6 +191,53 @@ class _PrepaidTokenModalState extends State<PrepaidTokenModal> {
     );
   }
 
+
+  
+Widget _buildStyledTextField(
+    TextEditingController controller,
+    String label, {
+    bool isNumeric = false,
+    bool isDateField = false,
+    bool enabled = true,
+    void Function(String)? onChanged, // Added onChanged parameter
+  }) {
+    return SizedBox(
+      height: 60,
+      child: TextFormField(
+        controller: controller,
+        enabled: enabled,
+        readOnly: isDateField,
+        keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.grey),
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          errorStyle: const TextStyle(height: 1, color: Colors.red),
+        ),
+        validator: (value) =>
+            value?.isEmpty ?? true ? 'Please enter a $label' : null,
+        onChanged: onChanged, // Updated to include onChanged method
+      ),
+    );
+  }
+
+
+
   @override
   void dispose() {
     _serialStartController.dispose();
@@ -181,77 +247,111 @@ class _PrepaidTokenModalState extends State<PrepaidTokenModal> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.isEditing ? "Edit Token" : "Add Token"),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_isLoading)
-              Center(child: CircularProgressIndicator())
-            else
-              _buildStyledDropdown(
-                label: 'Customer',
-                value: selectedCustomerId,
-                items: customers.map((customer) {
-                  return DropdownMenuItem<String>(
-                    value: customer['CustomerID'].toString(),
-                    child: Text(customer['Name'] ?? ''),
-                  );
-                }).toList(),
-                onChanged: (value) {
+
+    if (_isLoading) {
+      return Center(
+          child:
+              CircularProgressIndicator()); // Show loading indicator while data is being fetched
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.isEditing ? "Edit Token" : "Add Token"),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context), // Close the dialog
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_isLoading)
+                Center(child: CircularProgressIndicator())
+              else
+                _buildStyledDropdown(
+                  label: 'Customer',
+                  value: selectedCustomerId,
+                  items: customers.map((customer) {
+                    return DropdownMenuItem<String>(
+                      value: customer['CustomerID'].toString(),
+                      child: Text(customer['Name'] ?? ''),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCustomerId = value;
+                     
+                    });
+                  },
+                ),
+              
+              SizedBox(height: 20),
+              _buildStyledTextField(
+                _serialStartController,
+                "Start Serial Number",
+                isNumeric: true,
+                onChanged: (val) {
                   setState(() {
-                    selectedCustomerId = value;
-                    _showFields = true; // Show fields after selecting a customer
+                    _numberOfTokensController.text =
+                        calculateNumberOfTokens().toString();
                   });
                 },
               ),
-            if (_showFields) ...[
-              TextFormField(
-                controller: _serialStartController,
-                decoration: InputDecoration(labelText: "Start Serial Number"),
-                keyboardType: TextInputType.number,
-                onChanged: (val) => setState(() {
-                  _numberOfTokensController.text = calculateNumberOfTokens().toString();
-                }),
+
+SizedBox(height: 20),
+              _buildStyledTextField(
+                _serialEndController,
+                "End Serial Number",
+                isNumeric: true,
+                onChanged: (val) {
+                  setState(() {
+                    _numberOfTokensController.text =
+                        calculateNumberOfTokens().toString();
+                  });
+                },
               ),
-              TextFormField(
-                controller: _serialEndController,
-                decoration: InputDecoration(labelText: "End Serial Number"),
-                keyboardType: TextInputType.number,
-                onChanged: (val) => setState(() {
-                  _numberOfTokensController.text = calculateNumberOfTokens().toString();
-                }),
+
+SizedBox(height: 20),
+              _buildStyledTextField(
+                _pricePerBookController,
+                "Price Per Book",
+                isNumeric: true,
               ),
-              TextFormField(
-                controller: _pricePerBookController,
-                decoration: InputDecoration(labelText: "Price Per Book"),
-                keyboardType: TextInputType.number,
-              ),
-              TextFormField(
-                controller: _numberOfTokensController,
-                decoration: InputDecoration(labelText: "Number of Tokens"),
-                keyboardType: TextInputType.number,
+
+SizedBox(height: 20),
+              _buildStyledTextField(
+                _numberOfTokensController,
+                "Number of Tokens",
+                isNumeric: true,
                 enabled: false,
               ),
+
+              Center(
+                  child: SizedBox(
+                      width: 130.0, // Set your desired width
+                      height: 40.0,
+                      child: ElevatedButton(
+                          onPressed: _saveToken,
+                          child: Text(widget.isEditing ? 'Edit' : 'Add'),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 0, vertical: 0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              )))))
             ],
-          ],
+          ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text("Cancel"),
-        ),
-        if (_showFields)
-          ElevatedButton(
-            onPressed: _saveToken,
-            child: Text(widget.isEditing ? "Update" : "Add"),
-          ),
-      ],
+    
     );
   }
 }

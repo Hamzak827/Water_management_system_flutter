@@ -50,8 +50,9 @@ class _CanceledStatusModalState extends State<CanceledStatusModal> {
         );
       }
     } catch (e) {
+      final errorMessage = e.toString().replaceAll('Exception: ', '');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        SnackBar(content: Text(errorMessage)),
       );
     } finally {
       setState(() {

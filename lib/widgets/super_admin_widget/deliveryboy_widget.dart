@@ -196,7 +196,7 @@ int get totalPages {
                        final deliveryboy = _getPaginatedDeliveryBoys()[index];
 
 
-                      
+                      bool shouldHideDeleteButton = widget.role == 'admin';
 
                       return Container(
                         
@@ -400,6 +400,7 @@ int get totalPages {
     const SizedBox(width: 20), // Space between buttons
 
     // Delete Button
+                                      if (!shouldHideDeleteButton)
     SizedBox(
       width: 100,
       height: 40, // Set width for the button

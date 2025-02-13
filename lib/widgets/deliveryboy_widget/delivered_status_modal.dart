@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:water_management_system/services/auth_service.dart';
+import 'package:water_management_system/widgets/error_dialog.dart';
 
 class DeliveredStatusModal extends StatefulWidget {
   final Map<String, dynamic> order;
@@ -73,6 +74,8 @@ class _DeliveredStatusModalState extends State<DeliveredStatusModal> {
 
       print('Data:$updatedData');
 
+      try {
+
       bool success = await AuthService().updateOrderData(widget.order['OrderID'], updatedData);
 
       if (success) {
@@ -86,8 +89,18 @@ class _DeliveredStatusModalState extends State<DeliveredStatusModal> {
           
         );
       }
+      } catch (e) {
+        final errorMessage = e.toString().replaceAll('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
 
-      setState(() => _isLoading = false);
+     
     }
   }
 

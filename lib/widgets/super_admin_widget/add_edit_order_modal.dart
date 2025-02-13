@@ -61,13 +61,9 @@ double? customerPricePerBottle;
   List<Map<String, dynamic>> addresses = [];
   bool isLoading = true; // Add a loading state
 
-  @override
+@override
 void initState() {
   super.initState();
-
-
-
-  
 
   final address = widget.order?['Address'] ?? {};
   final addressLine = address['AddressLine'] ?? 'N/A';
@@ -76,65 +72,58 @@ void initState() {
   final country = address['Country'] ?? 'N/A';
   final formattedAddress = '$addressLine, $city, $postalCode, $country';
 
-
-   selectedStatus = widget.isEditing ? widget.order!['Status'] : 'Processing';
-
- // Assuming these values come from the order/customer
-
-   
-
-
+    selectedStatus = widget.isEditing ? widget.order!['Status'] : 'Processing';
 
   if (widget.isEditing && widget.order != null) {
+      // Parse the DeliveryDate from the order
+      final deliveryDate = widget.order!['DeliveryDate'];
+      final parsedDate =
+          DateTime.parse(deliveryDate); // Parse the ISO 8601 date
 
-
-   
     // Set initial values for the form fields
     _customerController = TextEditingController(text: widget.order!['CustomerID']?['Name'] ?? "");
     _addressController = TextEditingController(text: formattedAddress);
-    _deliverydateController = TextEditingController(text: _formatDate(widget.order!['DeliveryDate']),);
+      _deliverydateController = TextEditingController(
+          text: DateFormat('dd/MM/yyyy').format(parsedDate)); // Display format
     _collectedamountController = TextEditingController(text: (widget.order!['TotalCollectedAmount'] ?? 0).toString());
     _collectedbottlesController = TextEditingController(text: (widget.order!['TotalCollectedBottles'] ?? 0).toString());
     _deliveryboyController = TextEditingController(text: widget.order!['DeliveryBoyID']?['Name']);
     _statusController = TextEditingController(text: widget.order!['Status']);
 
+      // Store the API-formatted date
+      selectedDateForAPI =
+          DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(parsedDate);
+
     // Populate bottles list
     bottles = List<Map<String, dynamic>>.from(widget.order!['Bottles'] ?? []);
-
 
       // Check if PricePerLiter is null to adjust bottle fields
       if (widget.order!['PricePerLiter'] == null) {
         isPricePerLiterNull = true;
       }
 
-
     // Set the selected customer, address, and delivery boy
-    selectedCustomerId = widget.order!['CustomerID']?['CustomerID'].toString();
-    
+      selectedCustomerId =
+          widget.order!['CustomerID']?['CustomerID'].toString();
     selectedAddressId = widget.order!['Address']?['_id'];
     selectedDeliveryBoyId = widget.order!['DeliveryBoyID']?['DeliveryBoyID'].toString();
-    selectedStatus = widget.order!['Status']; 
-
-
-    
-  }
-  
-   else {
+      selectedStatus = widget.order!['Status'];
+    } else {
     _customerController = TextEditingController();
     _addressController = TextEditingController();
     _deliverydateController = TextEditingController();
     _collectedamountController = TextEditingController();
     _collectedbottlesController = TextEditingController();
     _deliveryboyController = TextEditingController();
-    _statusController = TextEditingController();
-    //selectedStatus = 'Processing';
+      _statusController = TextEditingController();
   }
-       print('Data:${selectedCustomerId}');
+
+    print('Data:${selectedCustomerId}');
+
   // Fetch customers and delivery boys
   _authService.fetchCustomers().then((data) {
     setState(() {
-      customers = data;
-      
+        customers = data;
       if (widget.isEditing) {
         _onCustomerChanged(selectedCustomerId); // Populate addresses based on selected customer
       }
@@ -143,18 +132,21 @@ void initState() {
 
   _authService.fetchDeliveryBoys().then((data) {
     setState(() {
-      deliveryBoys = data;
-     
+        deliveryBoys = data;
     });
   });
 
   // Simulate fetching data
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
-        isLoading = false;  // Data is ready, stop loading
+        isLoading = false; // Data is ready, stop loading
       });
     });
 }
+
+
+
+
 
 
 
@@ -277,11 +269,12 @@ void _addBottle() {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != DateTime.now()) {
+    if (picked != null) {
       setState(() {
-        _deliverydateController.text =  DateFormat('dd/MM/yyyy').format(picked);
-        selectedDateForAPI = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(picked); // For API
-        
+        _deliverydateController.text =
+            DateFormat('dd/MM/yyyy').format(picked); // Display format
+        selectedDateForAPI = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
+            .format(picked); // API format
       });
     }
   }
@@ -336,8 +329,8 @@ if (bottles.isEmpty) {
 
       final orderData = {
         "CustomerID": selectedCustomerId,
-       "Address": {"_id": selectedAddressId},
-        "DeliveryDate":selectedDateForAPI,
+        "Address": {"_id": selectedAddressId},
+        "DeliveryDate": selectedDateForAPI, // Use the API-formatted date
         "TotalCollectedAmount": _collectedamountController.text,
         "TotalCollectedBottles": _collectedbottlesController.text,
         "DeliveryBoyID": selectedDeliveryBoyId,

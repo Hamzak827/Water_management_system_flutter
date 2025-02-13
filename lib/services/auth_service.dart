@@ -993,8 +993,9 @@ Future<Map<String, dynamic>> fetchSpecificCustomer(String customerId) async {
 
      if (response.statusCode == 201) {
       return true;
-    } else if (response.statusCode == 409) {
-      throw Exception('Data already exists');
+      } else if (response.statusCode == 400) {
+        throw Exception(
+            'Prepaid token with overlapping serial numbers already exists for this customer');
     } else if (response.statusCode == 500) {
       throw Exception('Server error. Please try again later.');
     } else {
@@ -1050,6 +1051,73 @@ print('Response status: ${response.statusCode}');
     throw Exception('$e');
   }
 }
+
+
+
+//////////////////////////////////////// Deliveryboy Home Screen //////////////////////////////////////////////////////
+
+  Future<dynamic> getDeliveryBoyDashboardData(String rangeType,
+      {String? from, String? to, required String filterType}) async {
+    final token = await _storage.read(key: 'authToken'); // Retrieve token
+
+    if (token == null) {
+      throw Exception('No authentication token found');
+    }
+    final deliveryboyId = await _storage.read(key: 'deliveryboyId');
+
+    Uri url;
+
+    // Check if it's a custom range and both from and to are provided
+    if (rangeType == 'Custom Range' && from != null && to != null) {
+      url = Uri.parse(
+          '$baseUrl/statistics/delivery-boy/$deliveryboyId?from=$from&to=$to');
+    } else {
+      // For predefined ranges (Today, 7 days, 30 days)
+      url = Uri.parse(
+          '$baseUrl/statistics/delivery-boy/$deliveryboyId?rangeType=$rangeType&filterType=$filterType');
+    }
+
+    // Print the final URL for debugging
+
+    print('Fetching delivery boy data with URL: $url');
+    print('Fetching delivery boy data with From Date: $from');
+    print('Fetching delivery boy data with To Date: $to');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      print('getDeliveryBoyDashboardData Response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body); // Return fetched data
+      } else {
+        print('Response Status Code: ${response.statusCode}');
+        print('Response Body: ${response.body}');
+        throw Exception('Failed to fetch delivery boy data: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching delivery boy dashboard data: $e');
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

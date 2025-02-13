@@ -113,7 +113,7 @@ Future<void> _fetchCustomerId() async {
 Color _getStatusColor(String? status) {
   switch (status) {
     case 'Processing':
-      return Colors.yellow;
+        return Colors.orange;
     case 'Out For Delivery':
       return Colors.lightBlueAccent;
     case 'Delivered':
@@ -310,15 +310,19 @@ Padding(
         Container(
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: _getStatusColor(customer['Status']),
+                                                color: _getStatusColor(
+                                                        customer['Status'])
+                                                    .withOpacity(0.2),
             borderRadius: BorderRadius.circular(8.0), // Apply rounded corners
           ),
           child: Text(
             customer['Status'], // Display the status as text
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white, // White text for better contrast
-            ),
+                                                  style:
+                                                      GoogleFonts.sourceCodePro(
+                                                    fontSize: 12,
+                                                    color: _getStatusColor(customer[
+                                                        'Status']), // Text color matches the status color
+                                                  )
           ),
         )
   

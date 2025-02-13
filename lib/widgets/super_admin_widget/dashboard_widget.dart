@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:water_management_system/navigation/sidebar.dart';
 import 'package:water_management_system/services/auth_service.dart';
@@ -43,6 +44,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? _fromDate;
   String? _toDate;
 
+  
+
   // Dropdown options for date filter
   final List<String> filterOptions = ['7days', '30days', 'today', 'Custom Range'];
 
@@ -50,6 +53,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     fetchData();
+
+    
+
   }
 
   void _onFilterChanged(String selectedFilter) {
@@ -342,7 +348,10 @@ void _showFullScreenDatePicker(BuildContext context) async {
 
     if (data.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: Text('Dashboard')),
+        appBar: AppBar(
+            title: Text(widget.role == 'super-admin'
+                ? 'Super Admin Dashboard'
+                : 'Admin Dashboard')),
         drawer: Sidebar(
           role: widget.role,
           onMenuItemClicked: (route) {
@@ -380,9 +389,9 @@ void _showFullScreenDatePicker(BuildContext context) async {
               value: 1,
               color: Colors.grey,
               title: 'No Data',
-              radius: 40,
+              radius: 30,
               titleStyle: TextStyle(
-                fontSize: 8,
+                fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -392,9 +401,11 @@ void _showFullScreenDatePicker(BuildContext context) async {
             PieChartSectionData(
               value: deliveredCount.toDouble(),
               color: Colors.green,
+              
               title: '${(deliveredCount / totalStatusCount * 100).toStringAsFixed(1)}%',
+              radius: 30, // Adjust thickness
               titleStyle: TextStyle(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -403,8 +414,9 @@ void _showFullScreenDatePicker(BuildContext context) async {
               value: canceledCount.toDouble(),
               color: Colors.orange,
               title: '${(canceledCount / totalStatusCount * 100).toStringAsFixed(1)}%',
+              radius: 30, // Adjust thickness
               titleStyle: TextStyle(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -413,8 +425,9 @@ void _showFullScreenDatePicker(BuildContext context) async {
               value: outForDeliveryCount.toDouble(),
               color: Colors.blue,
               title: '${(outForDeliveryCount / totalStatusCount * 100).toStringAsFixed(1)}%',
+              radius: 30, // Adjust thickness
               titleStyle: TextStyle(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -423,8 +436,9 @@ void _showFullScreenDatePicker(BuildContext context) async {
               value: processingCount.toDouble(),
               color: Colors.yellow,
               title: '${(processingCount / totalStatusCount * 100).toStringAsFixed(1)}%',
+              radius: 30, // Adjust thickness
               titleStyle: TextStyle(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -432,7 +446,10 @@ void _showFullScreenDatePicker(BuildContext context) async {
           ];
 
     return Scaffold(
-      appBar: AppBar(title: Text('Dashboard')),
+      appBar: AppBar(
+          title: Text(widget.role == 'super-admin'
+              ? 'Super Admin Dashboard'
+              : 'Admin Dashboard')),
       drawer: Sidebar(
         role: widget.role,
         onMenuItemClicked: (route) {
@@ -507,32 +524,64 @@ void _showFullScreenDatePicker(BuildContext context) async {
 
             SizedBox(height: 32),
 
-            // Order Status Distribution
-            Text(
-              'Order Status Distribution',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            SizedBox(
-              height: 200,
-              child: PieChart(
-                PieChartData(
-                  sections: pieChartSections,
-                  centerSpaceRadius: 60,
-                  sectionsSpace: 2,
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
+        
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLegend('Delivered', Colors.green),
-                  _buildLegend('Canceled', Colors.orange),
-                  _buildLegend('Out For Delivery', Colors.blue),
-                  _buildLegend('Processing', Colors.yellow),
+                  // Heading
+                  Text(
+                    'Order Status Distribution',
+                    style: TextStyle(
+                      fontSize: 24, // Customize font size for heading
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black, // Customize text color
+                    ),
+                  ),
+                  SizedBox(height: 20), // Customize spacing
+
+                  // Legends and Pie Chart
+                  Row(
+                    children: [
+                      // Legends on the left
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLegend('Delivered', Colors.green),
+                            _buildLegend('Canceled', Colors.orange),
+                            _buildLegend('Out For Delivery', Colors.blue),
+                            _buildLegend('Processing', Colors.yellow),
+                          ],
+                        ),
+                      ),
+
+                      // Pie Chart on the right
+                      Expanded(
+                        flex: 3,
+                        child: SizedBox(
+                          height: 250, // Customize graph size
+                          child: PieChart(
+                            PieChartData(
+                              sections: pieChartSections,
+                              centerSpaceRadius:
+                                  50, // Customize center space radius
+                              sectionsSpace: 2,
+                            ),
+                          )
+                              .animate()
+                              .rotate // Add animation
+                              (
+                                  duration: 1000.ms,
+                                  curve: Curves.easeInOut) // Rotate animation
+                              .fadeIn(duration: 1000.ms), // Fade-in animation
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 40), // Customize spacing
                 ],
               ),
             ),
@@ -670,39 +719,7 @@ Padding(
 
   }
 
-  Widget buildStatsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        buildStatCard('Total Sales', totalTillDateSales),
-        buildStatCard('Total Income', totalTillDateIncome),
-        buildStatCard('Total Credit', totalTillDateCredit),
-        buildStatCard('Total Orders', totalOrders),
-        buildStatCard('Amount Received', totalAmountReceived),
-        buildStatCard('Pending Amount', totalAmountPending),
-        buildStatCard('Bottles Shipped', totalBottlesSent),
-        buildStatCard('Empty Bottles Received', totalEmptyBottlesReceived),
-        buildStatCard('Pending Bottles', totalPendingBottles),
-       
-        
-      ],
-    );
-  }
 
-  Widget buildStatCard(String title, double value) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(title),
-            Text(value.toStringAsFixed(2)),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget buildShimmerCard() {
     return Shimmer.fromColors(

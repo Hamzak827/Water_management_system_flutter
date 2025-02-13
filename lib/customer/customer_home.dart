@@ -126,8 +126,8 @@ Widget _buildProfileCard(customer, addresses) => Card(
           spacing: 20,
           runSpacing: 12,
           children: [
-            _buildDetailChip('Subscription', customer['SubscriptionType']),
-            _buildDetailChip('Payment', customer['PaymentMethod']),
+                  // _buildDetailChip('Subscription', customer['SubscriptionType']),
+                  // _buildDetailChip('Payment', customer['PaymentMethod']),
             _buildDetailChip('Security', '${customer['SecurityAmount'].toString()}'),
             _buildDetailChip('Bottles', customer['SecurityNumberofBottle'].toString()),
           ],

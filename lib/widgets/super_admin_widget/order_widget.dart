@@ -83,7 +83,7 @@ List<Map<String, dynamic>> filteredOrders = [];
 Color _getStatusColor(String? status) {
   switch (status) {
     case 'Processing':
-      return Colors.yellow;
+        return Colors.orange;
     case 'Out For Delivery':
       return Colors.lightBlueAccent;
     case 'Delivered':
@@ -210,6 +210,8 @@ bool shouldHideEditButton = widget.role == 'admin' &&
     (customer['Status'] == 'Delivered' ||
      customer['Status'] == 'Out For Delivery' ||
      customer['Status'] == 'Canceled');
+
+     
                       return Container(
                         
   margin: const EdgeInsets.only(bottom: 10),
@@ -279,25 +281,33 @@ Padding(
           fontWeight: FontWeight.w600,
         ),
       ),
-      ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 200), // Max width for the container
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-          decoration: BoxDecoration(
-            color: _getStatusColor(customer['Status']),
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          child: Text(
-            customer['Status'] ?? 'N/A',
-            style: GoogleFonts.sourceCodePro(
-              fontSize: 12,
-              color: _getStatusColor(customer['Status']) == Colors.white
-                  ? Colors.black
-                  : Colors.white,
-            ),
-          ),
-        ),
-      ),
+                                          ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                                maxWidth:
+                                                    200), // Max width for the container
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 4.0,
+                                                  horizontal: 8.0),
+                                              decoration: BoxDecoration(
+                                                color: _getStatusColor(
+                                                        customer['Status'])
+                                                    .withOpacity(
+                                                        0.2), // Lighter background
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                              ),
+                                              child: Text(
+                                                customer['Status'] ?? 'N/A',
+                                                style:
+                                                    GoogleFonts.sourceCodePro(
+                                                  fontSize: 12,
+                                                  color: _getStatusColor(customer[
+                                                      'Status']), // Text color matches the status color
+                                                ),
+                                              ),
+                                            ),
+                                          ),
     ],
   ),
 ),
