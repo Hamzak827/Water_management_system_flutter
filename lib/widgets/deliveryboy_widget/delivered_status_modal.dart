@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -81,18 +82,35 @@ class _DeliveredStatusModalState extends State<DeliveredStatusModal> {
       if (success) {
         Navigator.pop(context,true);
         
-        const SnackBar(content: Text("Order Delivered"));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          
-          const SnackBar(content: Text("Failed to update order. Please try again.")),
-          
+        
+          Fluttertoast.showToast(
+            msg: 'Order Delivered',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green.withOpacity(0.3),
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        } else {
+        
+          Fluttertoast.showToast(
+            msg: 'Failed to delivered order. Please try again.',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red.withOpacity(0.3),
+            textColor: Colors.white,
+            fontSize: 16.0,
         );
       }
       } catch (e) {
-        final errorMessage = e.toString().replaceAll('Exception: ', '');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
+
+        Fluttertoast.showToast(
+          msg: e.toString().replaceAll('Exception: ', ''),
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
       } finally {
         setState(() {

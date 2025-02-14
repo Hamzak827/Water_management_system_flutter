@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:water_management_system/services/auth_service.dart';
 import 'package:water_management_system/widgets/error_dialog.dart';
@@ -350,13 +351,39 @@ try{
 
       if (success) {
         Navigator.pop(context, true); // Close the modal
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(widget.isEditing ? 'Order Updated Successfully' : 'Order Added Successfully')));
+       
+          Fluttertoast.showToast(
+            msg: widget.isEditing
+                ? 'Order Updated Successfully'
+                : 'Order Added Successfully',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green.withOpacity(0.3),
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(widget.isEditing ? 'Failed to update order' : 'Failed to add order')));
+        
+          Fluttertoast.showToast(
+            msg: widget.isEditing
+                ? 'Failed to update order'
+                : 'Failed to add order',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red.withOpacity(0.3),
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
       }
 }catch (e) {
-      final errorMessage = e.toString().replaceAll('Exception: ', '');
-      DialogUtil.showErrorMessage(context,errorMessage);
+        Fluttertoast.showToast(
+          msg: e.toString().replaceAll('Exception: ', ''),
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
     }
       print("Order submitted: $orderData");
     }

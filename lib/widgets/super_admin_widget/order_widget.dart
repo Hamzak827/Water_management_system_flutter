@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -481,11 +482,17 @@ Padding(
             final orderId = customer['OrderID'].toString();
             final success = await AuthService().deleteOrder(orderId);
             if (success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Order deleted successfully'),
-                ),
-              );
+                                              Fluttertoast.showToast(
+                                                msg:
+                                                    'Order deleted successfully',
+                                                toastLength: Toast.LENGTH_SHORT,
+                                                gravity: ToastGravity.BOTTOM,
+                                                backgroundColor: Colors.green
+                                                    .withOpacity(0.3),
+                                                textColor: Colors.white,
+                                                fontSize: 16.0,
+                                              );
+            
               _fetchOrder();
                 setState(() {
         orders.removeWhere((element) => element['OrderID'].toString() == orderId);
@@ -493,11 +500,17 @@ Padding(
       });
               
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Failed to delete Order'),
-                ),
-              );
+              
+
+                                              Fluttertoast.showToast(
+                                                msg: 'Failed to delete Order',
+                                                toastLength: Toast.LENGTH_SHORT,
+                                                gravity: ToastGravity.BOTTOM,
+                                                backgroundColor:
+                                                    Colors.red.withOpacity(0.3),
+                                                textColor: Colors.white,
+                                                fontSize: 16.0,
+                                              );
             }
           }
         },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -422,11 +423,21 @@ int get totalPages {
             final deliveryboyId = deliveryboy['DeliveryBoyID'].toString();
             final success = await AuthService().deleteDeliveryboy(deliveryboyId);
             if (success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Delivery Boy deleted successfully'),
-                ),
-              );
+              
+
+                                                  Fluttertoast.showToast(
+                                                    msg:
+                                                        'Delivery Boy deleted successfully',
+                                                    toastLength:
+                                                        Toast.LENGTH_SHORT,
+                                                    gravity:
+                                                        ToastGravity.BOTTOM,
+                                                    backgroundColor: Colors
+                                                        .green
+                                                        .withOpacity(0.3),
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0,
+                                                  );
               _fetchDeliveryboy();
 
               
@@ -436,11 +447,20 @@ int get totalPages {
         filteredDeliveryboys.removeWhere((element) => element['DeliveryBoyID'].toString() == deliveryboyId);
       });
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Failed to delete Delivery Boy'),
-                ),
-              );
+             
+
+                                                  Fluttertoast.showToast(
+                                                    msg:
+                                                        'Failed to delete Delivery Boy',
+                                                    toastLength:
+                                                        Toast.LENGTH_SHORT,
+                                                    gravity:
+                                                        ToastGravity.BOTTOM,
+                                                    backgroundColor: Colors.red
+                                                        .withOpacity(0.3),
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0,
+                                                  );
             }
           }
         },

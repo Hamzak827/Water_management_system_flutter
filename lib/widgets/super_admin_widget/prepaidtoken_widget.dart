@@ -19,6 +19,7 @@ class PrepaidTokenScreen extends StatefulWidget {
 }
 
 class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
+
   final AuthService _authService = AuthService();
   late Future<List<Map<String, dynamic>>> _customersFuture;
   List<Map<String, dynamic>> customers = [];
@@ -46,9 +47,8 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
           customer['PrepaidTokens'].isNotEmpty;
     }).toList();
   }
-
 // Helper method to show Used Tokens dialog
-  void _showUsedTokensDialog(List<Map<String, dynamic>> usedTokens) {
+void _showUsedTokensDialog(List<Map<String, dynamic>> usedTokens) {
     // Collect and combine all tokens
     Set<int> allTokens = {}; // Using a Set to ensure uniqueness
     for (var token in usedTokens) {
@@ -56,26 +56,63 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
     }
 
     // Convert Set back to List and sort for better readability
-    //List<int> sortedTokens = allTokens.toList()..sort();
+    List<int> sortedTokens = allTokens.toList()..sort();
 
     // Show dialog with combined tokens
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Used Tokens"),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: allTokens.map((token) {
-                return Text("$token");
-              }).toList(),
+          title: Text(
+            "Used Tokens",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: SizedBox(
+            width: double.maxFinite, // Ensures the grid adapts to content
+            height: 300, // Set a fixed height for scrollable grid
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: AlwaysScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, // Adjust to set number of columns
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 2.5, // Adjust for token display size
+              ),
+              itemCount: sortedTokens.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blueAccent),
+                  ),
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.all(6),
+                  child: Text(
+                    "${sortedTokens[index]}",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("Close"),
+              child: Text(
+                "Close",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
@@ -83,49 +120,105 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
     );
   }
 
-// Helper method to show Prepaid Tokens dialog
-  void _showPrepaidTokensDialog(List<Map<String, dynamic>> prepaidTokens) {
+void _showPrepaidTokensDialog(List<Map<String, dynamic>> prepaidTokens) {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text("Prepaid Token Details"),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: prepaidTokens.map((token) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Token ID: ${token['_id']}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                        "Start Serial Number: ${token['serialNumberStarting']}"),
-                    Text("End Serial Number: ${token['serialNumberEnding']}"),
-                    Text("Price Per Book: \$${token['PricePerBook']}"),
-                    Text("Number of Tokens: ${token['numberoftokens']}"),
-                    Divider(), // Add a divider between tokens for better readability
-                  ],
-                );
-              }).toList(),
-            ),
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Close"),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 24.0),
+                      Text(
+                        "Prepaid Token Details",
+                        style: GoogleFonts.sourceCodePro(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      ...prepaidTokens.map((token) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Token ID: ${token['_id']}",
+                              style: GoogleFonts.sourceCodePro(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              "Start Serial Number: ${token['serialNumberStarting']}",
+                              style: GoogleFonts.sourceCodePro(
+                                fontSize: 14.0,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              "End Serial Number: ${token['serialNumberEnding']}",
+                              style: GoogleFonts.sourceCodePro(
+                                fontSize: 14.0,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              "Price Per Book: \$${token['PricePerBook']}",
+                              style: GoogleFonts.sourceCodePro(
+                                fontSize: 14.0,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              "Number of Tokens: ${token['numberoftokens']}",
+                              style: GoogleFonts.sourceCodePro(
+                                fontSize: 14.0,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 16.0),
+                            const Divider(), // Add a divider between tokens for better readability
+                          ],
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
+              ),
+              // Cross icon for closing the modal inside a circle
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: CircleAvatar(
+                    radius: 18.0,
+                    backgroundColor: Colors.grey[300],
+                    child: Icon(Icons.close, color: Colors.black, size: 20),
+                  ),
+                ),
             ),
           ],
+          ),
         );
       },
     );
   }
 
+
 // Helper method to show Unused Tokens dialog in Grid format
-  void _showUnusedTokensDialog(Map<String, dynamic> token) {
+void _showUnusedTokensDialog(Map<String, dynamic> token) {
     int start = token['serialNumberStarting'];
     int end = token['serialNumberEnding'];
     List<int> unusedTokens =
@@ -136,6 +229,7 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
       builder: (context) {
         return AlertDialog(
           title: Text("Unused Tokens"),
+
           content: SizedBox(
             width: double.maxFinite, // Ensures the grid adapts to content
             height: 300, // Set a fixed height for scrollable grid
@@ -166,6 +260,7 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
               },
             ),
           ),
+        
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -176,6 +271,7 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
       },
     );
   }
+
 
   Widget _buildRow(String label, String value) {
     return Padding(
@@ -212,6 +308,10 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
 
     return filteredCustomers.sublist(startIndex, endIndex);
   }
+
+
+
+
 
   // Calculate total pages based on filtered customers
   int get totalPages {
@@ -302,6 +402,7 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
                         ),
                         child: Card(
                           color: Color(0xFFFCFCF7),
+                          
                           margin: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -335,6 +436,7 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
                                         ? "${token['serialNumberStarting']} - ${token['serialNumberEnding']}"
                                         : "N/A"),
 
+
                                 // Used Tokens
                                 _buildRow(
                                     "Used Tokens:",
@@ -353,29 +455,40 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
                                       .toString(),
                                 ),
 
-                                // Token Book Price
-                                _buildRow("Token Book Price:",
-                                    "\$${token['PricePerBook'].toString()}"),
+
+                                _buildRow(
+                                  "Token Book Price:",
+                                  token['PricePerBook']?.toString() ??
+                                      '0', // Remove $ and add 0 if null
+                                ),
 
                                 // Price Per Book
-                                _buildRow("Price Per Book:",
-                                    "\$${customer['PricePerBook'].toString()}"),
-
+                                _buildRow(
+                                  "Price Per Book:",
+                                  customer['PricePerBook']?.toString() ??
+                                      '0', // Remove $ and add 0 if null
+                                ),
                                 SizedBox(height: 18),
 
+
+
+
+
+
+
+                      
 // Inside the Row widget where the action buttons are defined
-                                Wrap(
+Wrap(
                                   alignment: WrapAlignment.center,
                                   spacing:
-                                      2, // Horizontal spacing between buttons
+                                      8, // Horizontal spacing between buttons
                                   runSpacing:
                                       8, // Vertical spacing when wrapping to a new line
                                   children: [
-                                    // Used Button
-
                                     // Edit Button
                                     SizedBox(
-                                      width: 80,
+                                      width:
+                                          100, // Slightly wider for better readability
                                       height: 40,
                                       child: ElevatedButton.icon(
                                         style: ElevatedButton.styleFrom(
@@ -424,15 +537,17 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
                                         label: Text(
                                           'Edit',
                                           style: GoogleFonts.poppins(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
+                                            fontSize:
+                                                12, // Slightly larger font size
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ),
 
-                                    const SizedBox(width: 5),
+                                    // Used Button
                                     SizedBox(
-                                      width: 80,
+                                      width: 100,
                                       height: 40,
                                       child: ElevatedButton.icon(
                                         style: ElevatedButton.styleFrom(
@@ -470,17 +585,16 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
                                         label: Text(
                                           'Used',
                                           style: GoogleFonts.poppins(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ),
 
-                                    const SizedBox(width: 5),
-
                                     // Prepaid Button
                                     SizedBox(
-                                      width: 80,
+                                      width: 100,
                                       height: 40,
                                       child: ElevatedButton.icon(
                                         style: ElevatedButton.styleFrom(
@@ -517,16 +631,16 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
                                         label: Text(
                                           'Prepaid',
                                           style: GoogleFonts.poppins(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 5),
 
                                     // Unused Button
                                     SizedBox(
-                                      width: 80,
+                                      width: 100,
                                       height: 40,
                                       child: ElevatedButton.icon(
                                         style: ElevatedButton.styleFrom(
@@ -562,15 +676,17 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
                                         label: Text(
                                           'Unused',
                                           style: GoogleFonts.poppins(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 20),
                                   ],
                                 ),
                               ],
+
+                              
                             ),
                           ),
                         ),
@@ -728,6 +844,13 @@ class _PrepaidTokenScreenState extends State<PrepaidTokenScreen> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
+
     );
   }
+
+
+
+
+
 }

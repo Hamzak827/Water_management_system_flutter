@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:water_management_system/services/auth_service.dart';
 import 'package:water_management_system/widgets/error_dialog.dart'; // Make sure the API service is correctly imported
 
@@ -90,16 +91,24 @@ class _CustomerModalState extends State<CustomerModal> {
   }
 
 void _removeAddress(int index) async {
+    if (index < 0 || index >= addresses.length) {
+      // Handle invalid index
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invalid address index')),
+      );
+      return;
+    }
+
   var address = addresses[index];
   String? addressId = address['_id']; // Ensure this field is correct in your address object
 
   if (addressId == null) {
- setState(() {
+      // If the address doesn't have an ID, just remove it from the local list
+      setState(() {
       addresses.removeAt(index);
-    });
-    
+      });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Address ID is missing, cannot delete address')),
+        SnackBar(content: Text('Address removed successfully')),
     );
     return;
   }
@@ -113,14 +122,19 @@ void _removeAddress(int index) async {
       setState(() {
         addresses.removeAt(index);
       });
-      
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Address deleted successfully')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Address deleted successfully')),
+        );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete address')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete address')),
+        );
     }
   } catch (e) {
     print('Error deleting address: $e');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting address')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting address: ${e.toString()}')),
+      );
   }
 }
 
@@ -170,39 +184,56 @@ void _submitCustomer() async {
       "PrepaidTokens": []
     };
 
-    print('Order Data: ${jsonEncode(customerData)}'); // Debug log
+      print('Order Data: ${jsonEncode(customerData)}'); // Debug log
+try {
+        bool success = false;
 
-    try {
-      bool success = false;
+        if (widget.isEditing) {
+          // Edit customer and update address
+          success =
+              await _editCustomerAndAddress(widget.customerId!, customerData);
+        } else {
+          // Add new customer and address
+          success = await _addCustomerAndAddress(customerData);
+          print('Add Success:$success');
+        }
 
-      if (widget.isEditing) {
-        // Edit customer and update address
-        success = await _editCustomerAndAddress(widget.customerId!, customerData);
-      } else {
-        // Add new customer and address
-        success = await _addCustomerAndAddress(customerData);
-        print('Add Success:$success');
-      }
-
-      // Show success message
-      if (success) {
-        Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(widget.isEditing
+        // Show success message
+        if (success) {
+          Navigator.pop(context, true);
+          Fluttertoast.showToast(
+            msg: widget.isEditing
                 ? 'Customer Updated Successfully'
-                : 'Customer Added Successfully'),
-          ),
+                : 'Customer Added Successfully',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green.withOpacity(0.3),
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        } else {
+          Fluttertoast.showToast(
+            msg: widget.isEditing
+                ? 'Failed to update customer'
+                : 'Failed to add customer',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red.withOpacity(0.3),
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        }
+      } catch (e) {
+        // Display the specific exception message
+        Fluttertoast.showToast(
+          msg: e.toString().replaceAll('Exception: ', ''),
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
-      } else {
-        DialogUtil.showErrorMessage(context, widget.isEditing
-            ? 'Failed to update customer'
-            : 'Failed to add customer');
       }
-    } catch (e) {
-      final errorMessage = e.toString().replaceAll('Exception: ', '');
-      DialogUtil.showErrorMessage(context, errorMessage);
-    }
   }
 }
 
@@ -218,7 +249,16 @@ void _submitCustomer() async {
 
       return true;
     } catch (e) {
-      print('Error adding customer and address: $e');
+      print('Error during customer and address adding: $e');
+      // Show the specific error message to the user
+      Fluttertoast.showToast(
+        msg: e.toString().replaceAll('Exception: ', ''),
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.3),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
       return false;
     }
   }
@@ -244,6 +284,15 @@ Future<bool> _editCustomerAndAddress(String customerId, Map<String, dynamic> cus
     return true;
   } catch (e) {
     print('Error during customer and address update: $e');
+      // Show the specific error message to the user
+      Fluttertoast.showToast(
+        msg: e.toString().replaceAll('Exception: ', ''),
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.3),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     return false;
   }
 }
@@ -257,7 +306,16 @@ Future<void> _addCustomerAddress(String customerId, Map<String, dynamic> address
     final response = await AuthService().addCustomerAddress(customerId, address);
     if (response) {
       print('Address Added Successfully');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Address Added Successfully')));
+     
+        Fluttertoast.showToast(
+          msg: 'Address Added Successfully',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+
     } else {
       print('Failed to add address');
         //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add address')));
@@ -277,13 +335,39 @@ Future<void> _updateCustomerAddress(String customerId, String addressId, Map<Str
   try {
     final response = await AuthService().updateCustomerAddress(customerId, addressId, updatedAddress);
     if (response) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Address Updated Successfully')));
+ 
+        Fluttertoast.showToast(
+          msg: 'Address Updated Successfully',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update address')));
+   
+        Fluttertoast.showToast(
+          msg: 'Failed to update address',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+
     }
   } catch (e) {
     print('Error updating address: $e');
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error updating address')));
+   
+      Fluttertoast.showToast(
+        msg: e.toString().replaceAll('Exception: ', ''),
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.3),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
   }
 }
 
@@ -335,40 +419,39 @@ Widget _buildStyledDropdown({
 
 
 Widget _buildAddressRow(int index) {
-  final bottle = addresses[index];
+    final address = addresses[index];
 
   return Padding(
+      key: ValueKey(
+          address['_id'] ?? index), // Use a unique key for each address
     padding: const EdgeInsets.symmetric(vertical: 0),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // AddressLine in one row (first line)
-        
-SizedBox(
-  height: null, // Let it expand based on content size
-  child: TextFormField(
-    initialValue: bottle['AddressLine'].toString(),
-    decoration: InputDecoration(
-      labelText: "Address Line",
-      contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      filled: true,
-      fillColor: Colors.grey[100],
-    ),
-    maxLines: null, // Allows multiple lines
-    minLines: 1,    // Sets the minimum number of lines
-    onChanged: (value) {
-      setState(() {
-        addresses[index]['AddressLine'] = value;
-      });
-    },
-  ),
-),
-       
-
-         
+          // AddressLine in one row (first line)
+          SizedBox(
+            height: null, // Let it expand based on content size
+            child: TextFormField(
+              initialValue: address['AddressLine'].toString(),
+              decoration: InputDecoration(
+                labelText: "Address Line",
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
+              maxLines: null, // Allows multiple lines
+              minLines: 1, // Sets the minimum number of lines
+              onChanged: (value) {
+                setState(() {
+                  addresses[index]['AddressLine'] = value;
+                });
+              },
+            ),
+          ),
 
         const SizedBox(height: 10), // Space between AddressLine and next row
 
@@ -377,55 +460,53 @@ SizedBox(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // City Field
-            Expanded(
-
-               child: SizedBox(
-  
-        height: null,
-              child: TextFormField(
-                initialValue: bottle['City'].toString(),
-                decoration: InputDecoration(
-                  labelText: "City",
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              Expanded(
+                child: SizedBox(
+                  height: null,
+                  child: TextFormField(
+                    initialValue: address['City'].toString(),
+                    decoration: InputDecoration(
+                      labelText: "City",
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        addresses[index]['City'] = value;
+                      });
+                    },
                   ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    addresses[index]['City'] = value;
-                  });
-                },
-              ),
-               ),
             ),
             const SizedBox(width: 10), // Space between City and PostalCode
             // PostalCode Field
-            Expanded(
-
-               child: SizedBox(
-  
-        height: null,
-              child: TextFormField(
-                initialValue: bottle['PostalCode'].toString(),
-                decoration: InputDecoration(
-                  labelText: "Postal Code",
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              Expanded(
+                child: SizedBox(
+                  height: null,
+                  child: TextFormField(
+                    initialValue: address['PostalCode'].toString(),
+                    decoration: InputDecoration(
+                      labelText: "Postal Code",
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        addresses[index]['PostalCode'] = value;
+                      });
+                    },
                   ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    addresses[index]['PostalCode'] = value;
-                  });
-                },
-              ),
-               ),
             ),
           ],
         ),
@@ -433,27 +514,27 @@ SizedBox(
         const SizedBox(height: 10), // Space between City/PostalCode and Country
 
         // Country in one row (third line)
-         SizedBox(
-  
-        height: null,
-        child: TextFormField(
-          initialValue: bottle['Country'].toString(),
-          decoration: InputDecoration(
-            labelText: "Country",
-            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
+          SizedBox(
+            height: null,
+            child: TextFormField(
+              initialValue: address['Country'].toString(),
+              decoration: InputDecoration(
+                labelText: "Country",
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
+              onChanged: (value) {
+                setState(() {
+                  addresses[index]['Country'] = value;
+                });
+              },
             ),
-            filled: true,
-            fillColor: Colors.grey[100],
           ),
-          onChanged: (value) {
-            setState(() {
-              addresses[index]['Country'] = value;
-            });
-          },
-        ),
-         ),
 
         const SizedBox(height: 5), // Space between Country and Delete Button
 
@@ -462,7 +543,8 @@ SizedBox(
           alignment: Alignment.centerLeft,
           child: IconButton(
             icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () => _removeAddress(index),
+              onPressed: () =>
+                  _removeAddress(index), // Ensure the correct index is passed
           ),
         ),
       ],

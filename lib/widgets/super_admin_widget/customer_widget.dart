@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -400,34 +401,65 @@ Widget build(BuildContext context) {
           //side: BorderSide(color: Colors.redAccent, width: 1), // Border style
           padding: const EdgeInsets.symmetric(vertical: 12), // Padding inside the button
         ),
-        onPressed: () async {
-          final bool? confirmDelete = await _showDeleteConfirmationDialog(context);
-          if (confirmDelete == true) {
-            final customerId = customer['CustomerID'].toString();
-            final success = await AuthService().deleteCustomer(customerId);
-            if (success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Customer deleted successfully'),
-                ),
-              );
-              _fetchCustomers();
+                                          onPressed: () async {
+                                            final bool? confirmDelete =
+                                                await _showDeleteConfirmationDialog(
+                                                    context);
+                                            if (confirmDelete == true) {
+                                              final customerId =
+                                                  customer['CustomerID']
+                                                      .toString();
+                                              try {
+                                                final success =
+                                                    await AuthService()
+                                                        .deleteCustomer(
+                                                            customerId);
+                                                if (success) {
+                                                  Fluttertoast.showToast(
+                                                    msg:
+                                                        'Customer deleted successfully',
+                                                    toastLength:
+                                                        Toast.LENGTH_SHORT,
+                                                    gravity:
+                                                        ToastGravity.BOTTOM,
+                                                    backgroundColor: Colors
+                                                        .green
+                                                        .withOpacity(0.3),
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0,
+                                                  );
 
-              
-                 // Remove the deleted admin from both lists and update state
-      setState(() {
-        customers.removeWhere((element) => element['CustomerID'].toString() == customerId);
-        filteredCustomers.removeWhere((element) => element['CustomerID'].toString() == customerId);
-      });
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Failed to delete Customer'),
-                ),
-              );
-            }
-          }
-        },
+                                                  // Remove the deleted customer from the list
+                                                  setState(() {
+                                                    customers.removeWhere(
+                                                        (element) =>
+                                                            element['CustomerID']
+                                                                .toString() ==
+                                                            customerId);
+                                                    filteredCustomers
+                                                        .removeWhere((element) =>
+                                                            element['CustomerID']
+                                                                .toString() ==
+                                                            customerId);
+                                                  });
+                                                }
+                                              } catch (e) {
+                                                // Show the exact error message from the API
+                                                Fluttertoast.showToast(
+                                                  msg: e.toString().replaceAll(
+                                                      'Exception: ', ''),
+                                                  toastLength:
+                                                      Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  backgroundColor: Colors.red
+                                                      .withOpacity(0.3),
+                                                  textColor: Colors.white,
+                                                  fontSize: 16.0,
+                                                );
+                                              }
+                                            }
+                                          },
+
         icon: Icon(Icons.delete, size: 18), // Icon for the button
         label: Text(
           'Delete',

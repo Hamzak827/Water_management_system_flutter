@@ -135,9 +135,9 @@ class AuthService {
   }
 
 
- /////////////////////////////// Update Customer Data////////////////////////////////////////////////////////////////
- 
-Future<bool> updateCustomerData(String customerId, Map<String, dynamic> updatedData) async {
+  /////////////////////////////// Update Customer Data////////////////////////////////////////////////////////////////
+  Future<bool> updateCustomerData(
+      String customerId, Map<String, dynamic> updatedData) async {
   final token = await _storage.read(key: 'authToken'); // Retrieve token
   if (token == null) {
     throw Exception('No authentication token found');
@@ -172,10 +172,10 @@ Future<bool> updateCustomerData(String customerId, Map<String, dynamic> updatedD
     throw Exception('No internet connection');
   } catch (e) {
     print("Error: $e");
-     throw Exception('$e');
+      // Rethrow the original exception without overwriting it
+      rethrow;
   }
 }
-
 
 
 
@@ -199,8 +199,7 @@ Future<bool> addNewCustomer(Map<String, dynamic> newCustomerData) async {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
 
-    if (response.statusCode == 201) {
-      
+      if (response.statusCode == 201) {
       return true;
     } else if (response.statusCode == 400) {
       throw Exception('Customer with this Email already exists');
@@ -213,7 +212,8 @@ Future<bool> addNewCustomer(Map<String, dynamic> newCustomerData) async {
     throw Exception('No internet connection');
   } catch (e) {
     print("Error: $e");
-    throw Exception('$e');
+      // Rethrow the original exception without overwriting it
+      rethrow;
   }
 }
 
@@ -224,6 +224,8 @@ Future<bool> addNewCustomer(Map<String, dynamic> newCustomerData) async {
    if (token == null) {
     throw Exception('No authentication token found');
       }
+      
+    try {
     final url = Uri.parse('$baseUrl/customers/$customerId');
     final response = await http.delete(
       url,
@@ -238,8 +240,22 @@ Future<bool> addNewCustomer(Map<String, dynamic> newCustomerData) async {
 
     if (response.statusCode == 204) {
       return true; // Successfully deleted
+      } else if (response.statusCode == 403) {
+        throw Exception(
+            'Access denied. You do not have the required Resource Access.');
+      } else if (response.statusCode == 404) {
+        throw Exception('Customer not found.');
+      } else if (response.statusCode == 500) {
+        throw Exception('Server error. Please try again later.');
     } else {
       return false; // Failed to delete
+    }
+    } on SocketException {
+      throw Exception('No internet connection');
+    } catch (e) {
+      print("Error: $e");
+      // Rethrow the original exception without overwriting it
+      rethrow;
     }
   }
  

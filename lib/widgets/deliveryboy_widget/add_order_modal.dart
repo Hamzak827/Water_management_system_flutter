@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // For secure storage
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:water_management_system/services/auth_service.dart';
 import 'package:water_management_system/widgets/error_dialog.dart';
@@ -148,12 +149,36 @@ Future<void> _selectDate(BuildContext context) async {
 
         if (success) {
           Navigator.pop(context, true);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Order Added Successfully')));
+         
+          Fluttertoast.showToast(
+            msg: 'Order Added Successfully',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green.withOpacity(0.3),
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to add order')));
+         
+          Fluttertoast.showToast(
+            msg: 'Failed to add order',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red.withOpacity(0.3),
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
         }
       } catch (e) {
-        DialogUtil.showErrorMessage(context, e.toString());
+        
+        Fluttertoast.showToast(
+          msg: e.toString().replaceAll('Exception: ', ''),
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
       }
     }
   }

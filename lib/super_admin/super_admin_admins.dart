@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -393,11 +394,18 @@ final int numPages = endPage - startPage;
             final adminId = admin['AdminID'].toString();
             final success = await AuthService().deleteAdmin(adminId);
             if (success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Admin deleted successfully'),
-                ),
-              );
+             
+                                                Fluttertoast.showToast(
+                                                  msg:
+                                                      'Admin deleted successfully',
+                                                  toastLength:
+                                                      Toast.LENGTH_SHORT,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  backgroundColor: Colors.green
+                                                      .withOpacity(0.3),
+                                                  textColor: Colors.white,
+                                                  fontSize: 16.0,
+                                                );
               _fetchAdmins(); // Refresh the full admin list
      
                  // Remove the deleted admin from both lists and update state
@@ -406,11 +414,17 @@ final int numPages = endPage - startPage;
         filteredAdmins.removeWhere((element) => element['AdminID'].toString() == adminId);
       });
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Failed to delete Admin'),
-                ),
-              );
+             
+                                                Fluttertoast.showToast(
+                                                  msg: 'Failed to delete Admin',
+                                                  toastLength:
+                                                      Toast.LENGTH_SHORT,
+                                                  gravity: ToastGravity.BOTTOM,
+                                                  backgroundColor: Colors.red
+                                                      .withOpacity(0.3),
+                                                  textColor: Colors.white,
+                                                  fontSize: 16.0,
+                                                );
             }
           }
         },

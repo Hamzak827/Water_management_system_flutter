@@ -219,6 +219,21 @@ void _showFullScreenDatePicker(BuildContext context) async {
     });
   }
 
+  IconData _getFilterIcon(String filter) {
+    switch (filter) {
+      case 'Today':
+        return Icons.today;
+      case 'This Week':
+        return Icons.calendar_view_week;
+      case 'This Month':
+        return Icons.calendar_today;
+      case 'Custom Range':
+        return Icons.date_range;
+      default:
+        return Icons.filter_list;
+    }
+  }
+
   Color _getBarColor(int index) {
     switch (index) {
       case 0:
@@ -391,7 +406,7 @@ void _showFullScreenDatePicker(BuildContext context) async {
               title: 'No Data',
               radius: 30,
               titleStyle: TextStyle(
-                fontSize: 10,
+                fontSize: 8,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -463,39 +478,91 @@ void _showFullScreenDatePicker(BuildContext context) async {
           children: [
             // Filter Dropdown
             Align(
-              alignment: Alignment.centerRight,  // Align to the right
-              child: DropdownButton<String>(
-                value: _selectedFilter,
-                items: filterOptions.map((filter) {
-                  return DropdownMenuItem<String>(
-                    value: filter,
-                    child: Text(filter),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedFilter = newValue!;
-                    loading = true;
-                    _fromDate = null; // Reset custom date range
-                    _toDate = null;  // Reset custom date range
-                  });
+              alignment: Alignment.centerRight,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white, // Background color
+                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                  border: Border.all(
+                    color: Colors.grey[300]!, // Border color
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12, // Shadow color
+                      blurRadius: 4,
+                      offset: Offset(0, 2), // Shadow position
+                    ),
+                  ],
+                ),
+                child: DropdownButton<String>(
+                  value: _selectedFilter,
+                  items: filterOptions.map((filter) {
+                    return DropdownMenuItem<String>(
+                      value: filter,
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getFilterIcon(
+                                filter), // Add an icon for each filter
+                            color: Colors.blue, // Icon color
+                            size: 20,
+                          ),
+                          SizedBox(width: 8), // Space between icon and text
+                          Text(
+                            filter,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87, // Text color
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedFilter = newValue!;
+                      loading = true;
+                      _fromDate = null; // Reset custom date range
+                      _toDate = null; // Reset custom date range
+                    });
 
-                  if (newValue == 'Custom Range') {
-                    // Directly show the full-screen date picker modal
-                    Future.delayed(Duration.zero, () => _showFullScreenDatePicker(context));
-                  } else {
-                    // Fetch data for other filters
-                    fetchData();
-                  }
-                },
+                    if (newValue == 'Custom Range') {
+                      // Directly show the full-screen date picker modal
+                      Future.delayed(Duration.zero,
+                          () => _showFullScreenDatePicker(context));
+                    } else {
+                      // Fetch data for other filters
+                      fetchData();
+                    }
+                  },
+                  icon: Icon(
+                    Icons.arrow_drop_down, // Dropdown arrow icon
+                    color: Colors.blue, // Icon color
+                    size: 24,
+                  ),
+                  underline: SizedBox(), // Remove the default underline
+                  dropdownColor: Colors.white, // Dropdown background color
+                  elevation: 2, // Dropdown elevation
+                  borderRadius:
+                      BorderRadius.circular(8), // Rounded corners for dropdown
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87, // Text color
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ),
-
+            SizedBox(height: 15),
             Text(
               'Lifetime Statistics',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 25),
 
             GridView.builder(
               physics: NeverScrollableScrollPhysics(),
@@ -518,11 +585,17 @@ void _showFullScreenDatePicker(BuildContext context) async {
                   totalTillDateIncome,
                   totalTillDateCredit,
                 ];
-                return buildStatisticsCard(titles[index], values[index]);
+                return buildStatisticsCard(titles[index], values[index])
+                    .animate()
+                    .slideY // Add animation
+                    (
+                        duration: 1000.ms,
+                        curve: Curves.easeInOut) // Rotate animation
+                    .fadeIn(duration: 1000.ms);
               },
             ),
 
-            SizedBox(height: 32),
+            SizedBox(height: 20),
 
         
             Padding(
@@ -534,12 +607,12 @@ void _showFullScreenDatePicker(BuildContext context) async {
                   Text(
                     'Order Status Distribution',
                     style: TextStyle(
-                      fontSize: 24, // Customize font size for heading
+                      fontSize: 20, // Customize font size for heading
                       fontWeight: FontWeight.bold,
                       color: Colors.black, // Customize text color
                     ),
                   ),
-                  SizedBox(height: 20), // Customize spacing
+                  SizedBox(height: 5), // Customize spacing
 
                   // Legends and Pie Chart
                   Row(
@@ -581,11 +654,11 @@ void _showFullScreenDatePicker(BuildContext context) async {
                       ),
                     ],
                   ),
-                  SizedBox(height: 40), // Customize spacing
+                  // Customize spacing
                 ],
               ),
             ),
-            SizedBox(height: 32),
+            SizedBox(height: 5),
 
             // Current Range Statistics
             Text(
@@ -623,7 +696,14 @@ void _showFullScreenDatePicker(BuildContext context) async {
       totalEmptyBottlesReceived,
       totalPendingBottles,
     ];
-    return buildStatisticsCard(titles[index], values[index]);
+                return buildStatisticsCard(titles[index], values[index])
+                    .animate()
+                    .slideY // Add animation
+                    (
+                        duration: 1000.ms,
+                        curve: Curves.easeInOut) // Rotate animation
+                    .fadeIn(duration: 1000.ms);
+                ;
   },
 ),
 
@@ -634,77 +714,102 @@ void _showFullScreenDatePicker(BuildContext context) async {
             ),
             SizedBox(height: 16),
 SizedBox(
-  height: 500,
+              height: 350,
   child: Column(
     children: [
-      // Bar chart
-
+                  // Bar chart
 Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Wrap(
-        spacing: 8.0, // Space between items
-        runSpacing: 4.0, // Space between lines
-        children: [
-          _buildLegend('Amount Received',Colors.blue),
-          _buildLegend( 'Amount Pending',Colors.red),
-          _buildLegend('Bottle Shipped',Colors.green),
-          _buildLegend('Empty Bottles',Colors.orange),
-          _buildLegend('Pending Bottles',Colors.purple),
-          _buildLegend('Orders',Colors.teal),
-        ],
-      ),
-      ),
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            _buildLegend('Amount Received', Colors.blue),
+                            SizedBox(width: 8),
+                            _buildLegend('Amount Pending', Colors.red),
+                            SizedBox(width: 8),
+                            _buildLegend('Bottle Shipped', Colors.green),
+                          ],
+                        ),
+                        SizedBox(height: 4), // Space between rows
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            _buildLegend('Empty Bottles', Colors.orange),
+                            SizedBox(width: 8),
+                            _buildLegend('Pending Bottles', Colors.purple),
+                            SizedBox(width: 8),
+                            _buildLegend('Orders', Colors.teal),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+
 
  SizedBox(height: 32),
-      Expanded(
-        child: BarChart(
-          BarChartData(
-            titlesData: FlTitlesData(
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 32,
-                  getTitlesWidget: (double value, TitleMeta meta) {
-                    final reversedIndex = 9 - value.toInt();
-                    if (reversedIndex % 2 == 0) {
-                      final dateFormat = DateFormat('dd MMM');
-                      final date = DateTime.now().subtract(Duration(days: reversedIndex));
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 4.0),
-                        child: Text(
-                          dateFormat.format(date),
-                          style: const TextStyle(fontSize: 10),
+
+
+                  AspectRatio(
+                    aspectRatio: 1.5, // Change ratio as needed
+                    child: BarChart(
+                      BarChartData(
+                        titlesData: FlTitlesData(
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 32,
+                              getTitlesWidget: (double value, TitleMeta meta) {
+                                final reversedIndex = 9 - value.toInt();
+                                if (reversedIndex % 2 == 0) {
+                                  final dateFormat = DateFormat('dd MMM');
+                                  final date = DateTime.now()
+                                      .subtract(Duration(days: reversedIndex));
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 4.0),
+                                    child: Text(
+                                      dateFormat.format(date),
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                          ),
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 30,
+                              interval: 1000,
+                              getTitlesWidget: (double value, TitleMeta meta) {
+                                return Text(
+                                  '${value.toInt()}',
+                                  style: const TextStyle(fontSize: 10),
+                                );
+                              },
+                            ),
+                          ),
+                          topTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false)),
+                          rightTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false)),
                         ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-              ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 30,
-                  interval: 1000,
-                  getTitlesWidget: (double value, TitleMeta meta) {
-                    return Text(
-                      '${value.toInt()}',
-                      style: const TextStyle(fontSize: 10),
-                    );
-                  },
-                ),
-              ),
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            ),
-            gridData: FlGridData(show: true),
-            borderData: FlBorderData(show: true, border: Border.all(color: Colors.black, width: 1)),
-            minY: -3000,
-            maxY: 3000,
-            barGroups: _buildChartData(),
-          ),
-        ),
-      ),
+                        gridData: FlGridData(show: true),
+                        borderData: FlBorderData(
+                            show: true,
+                            border: Border.all(color: Colors.black, width: 1)),
+                        minY: -3000,
+                        maxY: 3000,
+                        barGroups: _buildChartData(),
+                        // Your chart configuration here...
+                      ),
+                    ),
+                  ),
+
+ 
       // Legend
       
     ],
@@ -731,55 +836,76 @@ Padding(
     );
   }
 }
-
-
-
-
 Widget buildStatisticsCard(String title, double value) {
-  // Create a number formatter for large numbers
   final numberFormat = NumberFormat("#,##0.00", "en_US");
-  
-  // Function to convert large values into more readable formats
+
   String formatValue(double value) {
     if (value >= 1e12) {
-      return (value / 1e12).toStringAsFixed(2) + " T"; // Trillion
+      return (value / 1e12).toStringAsFixed(2) + " T";
     } else if (value >= 1e9) {
-      return (value / 1e9).toStringAsFixed(2) + " B"; // Billion
+      return (value / 1e9).toStringAsFixed(2) + " B";
     } else if (value >= 1e6) {
-      return (value / 1e6).toStringAsFixed(2) + " M"; // Million
+      return (value / 1e6).toStringAsFixed(2) + " M";
     } else if (value >= 1e3) {
-      return (value / 1e3).toStringAsFixed(2) + " K"; // Thousand
+      return (value / 1e3).toStringAsFixed(2) + " K";
     } else {
-      return numberFormat.format(value); // Default formatting for smaller numbers
+      return numberFormat.format(value);
     }
   }
 
   return Card(
-    margin: EdgeInsets.symmetric(vertical: 20),
-    child: Padding(
-      padding: const EdgeInsets.all(16.0), // Padding around content
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Align to the left
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16, 
-              fontWeight: FontWeight.bold, 
-              overflow: TextOverflow.ellipsis, // Ensure title doesn't overflow
+    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+    elevation: 5,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFF3A6186).withOpacity(0.7),
+            Colors.white,
+            //Colors.blueAccent.withOpacity(0.5), Color(0xFF18FFFF)
+          ], // Gradient colors
+          begin: Alignment.bottomLeft,
+          end: Alignment.topRight,
+        ),
+        borderRadius: BorderRadius.circular(12), // Matches Card's shape
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white, // Updated for contrast
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    formatValue(value),
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // Updated for contrast
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-            maxLines: 1, // Ensure title fits in one line
-          ),
-          SizedBox(height: 8), // Space between title and value
-          Text(
-            formatValue(value), // Use the formatted value
-            style: TextStyle(
-              fontSize: 18, 
-              fontWeight: FontWeight.bold, 
-              color: Colors.blue, // Color for the value
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );
@@ -794,12 +920,12 @@ Widget buildStatisticsCard(String title, double value) {
    children: [
      
       Container(
-        width: 16,
-        height: 16,
+          width: 12,
+          height: 12,
         color: color,
       ),
       SizedBox(width: 8),
-      Text(label, style: TextStyle(fontSize: 16)),
+        Text(label, style: TextStyle(fontSize: 12)),
     ],
   ),
 );

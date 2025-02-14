@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:water_management_system/services/auth_service.dart';
 import 'package:water_management_system/widgets/error_dialog.dart';
 
@@ -128,18 +129,40 @@ class _PrepaidTokenModalState extends State<PrepaidTokenModal> {
 
     if (success) {
       Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-                'Token ${widget.isEditing ? 'Updated' : 'Added'} Successfully')));
+       
+Fluttertoast.showToast(
+          msg: 'Token ${widget.isEditing ? 'Updated' : 'Added'} Successfully',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+                
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-            content: Text(
-                'Failed to ${widget.isEditing ? 'update' : 'add'} token')));
+      
+
+
+                       
+Fluttertoast.showToast(
+          msg: 'Failed to ${widget.isEditing ? 'update' : 'add'} token',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
       }
     } catch (e) {
-      final errorMessage = e.toString().replaceAll('Exception: ', '');
-      DialogUtil.showErrorMessage(context, errorMessage);
+      
+      Fluttertoast.showToast(
+        msg: e.toString().replaceAll('Exception: ', ''),
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.3),
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 

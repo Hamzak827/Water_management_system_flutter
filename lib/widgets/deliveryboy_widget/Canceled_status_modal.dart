@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:water_management_system/services/auth_service.dart';
@@ -40,19 +41,36 @@ class _CanceledStatusModalState extends State<CanceledStatusModal> {
       });
 
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Order successfully canceled")),
+        
+        Fluttertoast.showToast(
+          msg: 'Order successfully canceled',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
         Navigator.pop(context,true); // Close modal with reason
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to update order")),
+        
+        Fluttertoast.showToast(
+          msg: 'Failed to cancel order',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.3),
+          textColor: Colors.white,
+          fontSize: 16.0,
         );
       }
     } catch (e) {
-      final errorMessage = e.toString().replaceAll('Exception: ', '');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
+      
+      Fluttertoast.showToast(
+        msg: e.toString().replaceAll('Exception: ', ''),
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.3),
+        textColor: Colors.white,
+        fontSize: 16.0,
       );
     } finally {
       setState(() {

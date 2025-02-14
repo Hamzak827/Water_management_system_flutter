@@ -129,6 +129,21 @@ class _DeliveryBoyHomeScreenState extends State<DeliveryBoyHomeScreen> {
     }
   }
 
+  IconData _getFilterIcon(String filter) {
+    switch (filter) {
+      case 'Today':
+        return Icons.today;
+      case 'This Week':
+        return Icons.calendar_view_week;
+      case 'This Month':
+        return Icons.calendar_today;
+      case 'Custom Range':
+        return Icons.date_range;
+      default:
+        return Icons.filter_list;
+    }
+  }
+
   Widget buildStatisticsCard(String title, double value) {
     // Create a number formatter for large numbers
     final numberFormat = NumberFormat("#,##0.00", "en_US");
@@ -278,13 +293,48 @@ return Scaffold(
           children: [
             // Filter Dropdown
             Align(
-              alignment: Alignment.centerRight, // Align to the right
-              child: DropdownButton<String>(
+              alignment: Alignment.centerRight,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white, // Background color
+                  borderRadius: BorderRadius.circular(8), // Rounded corners
+                  border: Border.all(
+                    color: Colors.grey[300]!, // Border color
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12, // Shadow color
+                      blurRadius: 4,
+                      offset: Offset(0, 2), // Shadow position
+                    ),
+                  ],
+                ),
+                child: DropdownButton<String>(
                 value: _selectedFilter,
                 items: filterOptions.map((filter) {
                   return DropdownMenuItem<String>(
                     value: filter,
-                    child: Text(filter),
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getFilterIcon(
+                                filter), // Add an icon for each filter
+                            color: Colors.blue, // Icon color
+                            size: 20,
+                          ),
+                          SizedBox(width: 8), // Space between icon and text
+                          Text(
+                            filter,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black87, // Text color
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -304,9 +354,26 @@ return Scaffold(
                     fetchData();
                   }
                 },
+                  icon: Icon(
+                    Icons.arrow_drop_down, // Dropdown arrow icon
+                    color: Colors.blue, // Icon color
+                    size: 24,
+                  ),
+                  underline: SizedBox(), // Remove the default underline
+                  dropdownColor: Colors.white, // Dropdown background color
+                  elevation: 2, // Dropdown elevation
+                  borderRadius:
+                      BorderRadius.circular(8), // Rounded corners for dropdown
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87, // Text color
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+
               ),
             ),
-
             SizedBox(height: 16),
 
             // Current Range Statistics
