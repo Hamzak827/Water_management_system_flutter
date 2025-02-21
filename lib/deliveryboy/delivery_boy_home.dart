@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -126,6 +127,16 @@ class _DeliveryBoyHomeScreenState extends State<DeliveryBoyHomeScreen> {
 
       // Fetch data after date selection
       fetchData();
+    } else {
+      // Reset the filter to the previous value if no date range is selected
+      setState(() {
+        _selectedFilter = '7days';
+        _fromDate = null; // Reset custom date range
+        _toDate = null; // Reset custom date range
+      });
+
+      // Fetch data after date selection
+      fetchData();
     }
   }
 
@@ -145,49 +156,101 @@ class _DeliveryBoyHomeScreenState extends State<DeliveryBoyHomeScreen> {
   }
 
   Widget buildStatisticsCard(String title, double value) {
-    // Create a number formatter for large numbers
-    final numberFormat = NumberFormat("#,##0.00", "en_US");
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 2, horizontal: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(
+            14), // Slightly larger radius for outer border
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2), // Subtle shadow effect
+            blurRadius: 8,
+            offset: Offset(2, 4),
+          ),
+        ],
+      ),
+      child: Container(
+        margin: EdgeInsets.all(
+            2), // The space between the outer and inner container
+        decoration: BoxDecoration(
+          borderRadius:
+              BorderRadius.circular(12), // Inner container's border radius
 
-    // Function to convert large values into more readable formats
-    String formatValue(double value) {
-      if (value >= 1e12) {
-        return (value / 1e12).toStringAsFixed(2) + " T"; // Trillion
-      } else if (value >= 1e9) {
-        return (value / 1e9).toStringAsFixed(2) + " B"; // Billion
-      } else if (value >= 1e6) {
-        return (value / 1e6).toStringAsFixed(2) + " M"; // Million
-      } else if (value >= 1e3) {
-        return (value / 1e3).toStringAsFixed(2) + " K"; // Thousand
-      } else {
-        return numberFormat
-            .format(value); // Default formatting for smaller numbers
-      }
-    }
+          gradient: LinearGradient(
+            colors: [
+              // Color(0xFF00C6FB), // Light blue
+              // Color(0xFF005BEA), // Reddish shade
+              Color(0xFF14557B), // Light blue
+              Color(0xFF7FCEC5),
+            ],
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight,
+          ),
+          // color:
 
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0), // Padding around content
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // Align to the left
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                overflow:
-                    TextOverflow.ellipsis, // Ensure title doesn't overflow
-              ),
-              maxLines: 1, // Ensure title fits in one line
+          //     Color(0xFFc67763),
+
+          boxShadow: [
+            BoxShadow(
+              color:
+                  Colors.black.withOpacity(0.1), // Light shadow for inner card
+              blurRadius: 6,
+              offset: Offset(0, 2),
             ),
-            SizedBox(height: 8), // Space between title and value
-            Text(
-              formatValue(value), // Use the formatted value
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue, // Color for the value
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Background Wave Design
+
+            // Card Content
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 4,
+                                color: Colors.black.withOpacity(0.5),
+                                offset: Offset(2, 2),
+                              ),
+                            ],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          value.toInt().toString(),
+                          style: GoogleFonts.poppins(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 6,
+                                color: Colors.black.withOpacity(0.5),
+                                offset: Offset(2, 2),
+                              ),
+                            ],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -195,6 +258,114 @@ class _DeliveryBoyHomeScreenState extends State<DeliveryBoyHomeScreen> {
       ),
     );
   }
+
+Widget buildStatisticsCardWithIcon(
+      String title, double value, IconData icon) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            // Color(0xFF00C6FB), // Light blue
+            // Color(0xFF005BEA), // Reddish shade
+            Color(0xFF14557B), // Light blue
+            Color(0xFF7FCEC5),
+          ],
+          begin: Alignment.bottomLeft,
+          end: Alignment.topRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color:
+                Colors.black.withOpacity(0.3), // Slightly stronger shadow color
+            blurRadius: 16, // Increased blur radius for stronger effect
+            offset:
+                Offset(4, 8), // Increased offset for a more pronounced shadow
+          ),
+          BoxShadow(
+            color: Colors.black
+                .withOpacity(0.1), // Second shadow for additional depth
+            blurRadius: 8, // Smaller blur radius for a subtler shadow
+            offset: Offset(2, 4), // Slightly offset to enhance the effect
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          children: [
+            // Icon inside a round circle on the left
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white, // Circle color
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: Offset(2, 4),
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.all(8), // Padding inside the circle
+              child: Icon(
+                icon,
+                size: 30, // Adjust icon size
+                color: Color(0xFF355C7D), // Icon color
+              ),
+            ),
+            SizedBox(width: 16), // Spacing between icon and text
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.black.withOpacity(0.5),
+                          offset: Offset(2, 2),
+                        ),
+                      ],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    value.toInt().toString(),
+                    style: GoogleFonts.poppins(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 6,
+                          color: Colors.black.withOpacity(0.5),
+                          offset: Offset(2, 2),
+                        ),
+                      ],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +375,12 @@ class _DeliveryBoyHomeScreenState extends State<DeliveryBoyHomeScreen> {
     if (loading) {
 return Scaffold(
 
-        appBar: AppBar(title: Text('Dashboard')),
+        appBar: AppBar(
+          title: Text('Dashboard',
+              style:
+                  GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.bold)),
+          centerTitle: true,
+        ),
         drawer: Sidebar(
           role: role,
           onMenuItemClicked: (route) {
@@ -267,7 +443,12 @@ return Scaffold(
 
     if (data.isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: Text('Dashboard')),
+        appBar: AppBar(
+          title: Text('Dashboard',
+              style:
+                  GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.bold)),
+          centerTitle: true,
+        ),
         drawer: Sidebar(
           role: role,
           onMenuItemClicked: (route) {
@@ -279,7 +460,11 @@ return Scaffold(
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Dashboard')),
+      appBar: AppBar(
+        title: Text('Dashboard',
+            style: GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
       drawer: Sidebar(
         role: role,
         onMenuItemClicked: (route) {
@@ -292,95 +477,116 @@ return Scaffold(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Filter Dropdown
-            Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white, // Background color
-                  borderRadius: BorderRadius.circular(8), // Rounded corners
-                  border: Border.all(
-                    color: Colors.grey[300]!, // Border color
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12, // Shadow color
-                      blurRadius: 4,
-                      offset: Offset(0, 2), // Shadow position
+            // Filter Dropdown
+            Row(
+              mainAxisAlignment:
+                  MainAxisAlignment.spaceBetween, // Ensures proper spacing
+              children: [
+                // Left-aligned text
+                Text(
+                  'Current Range Stats',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+
+                // Right-aligned dropdown
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.grey.shade100,
+                        Color.fromARGB(255, 218, 217, 217),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      stops: [0.1, 0.9],
                     ),
-                  ],
-                ),
-                child: DropdownButton<String>(
-                value: _selectedFilter,
-                items: filterOptions.map((filter) {
-                  return DropdownMenuItem<String>(
-                    value: filter,
-                      child: Row(
-                        children: [
-                          Icon(
-                            _getFilterIcon(
-                                filter), // Add an icon for each filter
-                            color: Colors.blue, // Icon color
-                            size: 20,
-                          ),
-                          SizedBox(width: 8), // Space between icon and text
-                          Text(
-                            filter,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87, // Text color
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Color.fromARGB(255, 41, 42, 42),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6,
+                        offset: Offset(0, 3),
                       ),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedFilter = newValue!;
-                    loading = true;
-                    _fromDate = null; // Reset custom date range
-                    _toDate = null; // Reset custom date range
-                  });
-
-                  if (newValue == 'Custom Range') {
-                    // Directly show the full-screen date picker modal
-                    Future.delayed(Duration.zero,
-                        () => _showFullScreenDatePicker(context));
-                  } else {
-                    // Fetch data for other filters
-                    fetchData();
-                  }
-                },
-                  icon: Icon(
-                    Icons.arrow_drop_down, // Dropdown arrow icon
-                    color: Colors.blue, // Icon color
-                    size: 24,
+                    ],
                   ),
-                  underline: SizedBox(), // Remove the default underline
-                  dropdownColor: Colors.white, // Dropdown background color
-                  elevation: 2, // Dropdown elevation
-                  borderRadius:
-                      BorderRadius.circular(8), // Rounded corners for dropdown
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black87, // Text color
-                    fontWeight: FontWeight.w500,
+                  child: PopupMenuButton<String>(
+                    itemBuilder: (context) => filterOptions.map((filter) {
+                      return PopupMenuItem<String>(
+                        value: filter,
+                        child: Row(
+                          children: [
+                            Icon(
+                              _getFilterIcon(
+                                  filter), // Add an icon for each filter
+                              color: Colors.blue.shade800, // Icon color
+                              size: 20,
+                            ),
+                            SizedBox(width: 8), // Space between icon and text
+                            Text(
+                              filter,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87, // Text color
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onSelected: (newValue) {
+                      setState(() {
+                        _selectedFilter = newValue;
+                        loading = true;
+                        _fromDate = null; // Reset custom date range
+                        _toDate = null; // Reset custom date range
+                      });
+
+                      if (newValue == 'Custom Range') {
+                        // Directly show the full-screen date picker modal
+                        Future.delayed(Duration.zero,
+                            () => _showFullScreenDatePicker(context));
+                      } else {
+                        // Fetch data for other filters
+                        fetchData();
+                      }
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _selectedFilter,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black87, // Text color
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.blue.shade800, // Icon color
+                          size: 24,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-
-
-              ),
+              ],
             ),
-            SizedBox(height: 16),
 
-            // Current Range Statistics
-            Text(
-              'Current Range Statistics',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+
+
+
+
+
+
+
+           
 
             SizedBox(height: 16),
 
@@ -390,10 +596,10 @@ return Scaffold(
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // Two columns
-                crossAxisSpacing: 16, // Space between columns
-                mainAxisSpacing: 16, // Space between
+                crossAxisSpacing: 0, // Space between columns
+                mainAxisSpacing: 12, // Space between
                 childAspectRatio:
-                    2 / 1.5, // Adjust card aspect ratio for better visibility
+                    2 / 1.2, // Adjust card aspect ratio for better visibility
               ),
               itemCount: 6,
               itemBuilder: (context, index) {

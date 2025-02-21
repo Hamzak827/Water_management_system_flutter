@@ -322,7 +322,9 @@ Widget _buildMetricDisplay(String title, String value, Color color) => Column(
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Customer Dashboard"),
+          title: Text("Customer Dashboard",
+              style:
+                  GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       drawer: Sidebar(

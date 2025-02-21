@@ -160,7 +160,8 @@ final totalItems = _searchQuery.isEmpty
     : filteredDeliveryboyOrders.length;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Customer Orders"),
+        title: Text("Customer Orders",
+            style: GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       drawer: Sidebar(
@@ -212,6 +213,9 @@ final totalItems = _searchQuery.isEmpty
     controller: _searchController,
     decoration: InputDecoration(
       hintText: 'Search by name, order ID, or status...',
+                      hintStyle:
+                          GoogleFonts.lato(fontSize: 16, color: Colors.black54),
+      
       prefixIcon: Icon(Icons.search),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
@@ -241,8 +245,14 @@ final totalItems = _searchQuery.isEmpty
     border: Border(
       top: BorderSide(color: Colors.black, width: 1),  // Normal border on top
       left: BorderSide(color: Colors.black, width: 1), // Normal border on left
-      right: BorderSide(color: Colors.black, width: 3), // Thicker border on the right for 3D effect
-      bottom: BorderSide(color: Colors.black, width: 3), // Thicker border on the bottom for 3D effect
+                              right: BorderSide(
+                                  color: Colors.black,
+                                  width:
+                                      2), // Thicker border on the right for 3D effect
+                              bottom: BorderSide(
+                                  color: Colors.black,
+                                  width:
+                                      2), // Thicker border on the bottom for 3D effect
     ),
     boxShadow: [
       BoxShadow(
@@ -351,7 +361,9 @@ Padding(
                 ),
                 Expanded(
                   child: Text(
-                    customer['"TotalPrice'].toString() ?? 'N/A',
+                                                customer['"TotalPrice']
+                                                        ?.toString() ??
+                                                    '0',
                     style: GoogleFonts.sourceCodePro(fontSize: 14, color: Colors.black54),
                   ),
                 ),
@@ -404,7 +416,9 @@ Padding(
                 ),
                 Expanded(
                   child: Text(
-                    customer['"TotalCollectedAmount'].toString() ?? 'N/A',
+                                                customer['"TotalCollectedAmount']
+                                                        ?.toString() ??
+                                                    '0',
                     style: GoogleFonts.sourceCodePro(fontSize: 14, color: Colors.black54),
                   ),
                 ),
@@ -511,7 +525,7 @@ Padding(
         style: ElevatedButton.styleFrom(
           primary: Colors.white, // Button background color
           onPrimary: Colors.green, // Text and icon color
-          elevation: 5, // Add shadow
+                                            elevation: 3, // Add shadow
           shadowColor: Colors.greenAccent.withOpacity(1), // Shadow color with opacity
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10), // Rounded corners
@@ -599,7 +613,7 @@ Padding(
               primary: Colors.white, // Button background color
           onPrimary: Colors.blue, // Text and icon color
           
-          elevation: 5, // Add shadow
+                                                  elevation: 3, // Add shadow
           shadowColor: Colors.blueAccent.withOpacity(1), // Shadow color with opacity
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10), // Rounded corners

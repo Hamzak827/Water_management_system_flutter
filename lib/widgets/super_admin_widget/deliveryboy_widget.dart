@@ -118,7 +118,11 @@ int get totalPages {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.role == 'super-admin' ? 'Super Admin Deliveryboy' : 'Admin Deliveryboy'),
+        title: Text(
+            widget.role == 'super-admin'
+                ? 'Manage Delivery Boys'
+                : 'Manage Delivery Boys',
+            style: GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       drawer: Sidebar(
@@ -171,6 +175,9 @@ int get totalPages {
     controller: _searchController,
     decoration: InputDecoration(
       hintText: 'Search by name, email, or phone...',
+                      hintStyle:
+                          GoogleFonts.lato(fontSize: 16, color: Colors.black54),
+      
       prefixIcon: Icon(Icons.search),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
@@ -207,8 +214,14 @@ int get totalPages {
     border: Border(
       top: BorderSide(color: Colors.black, width: 1),  // Normal border on top
       left: BorderSide(color: Colors.black, width: 1), // Normal border on left
-      right: BorderSide(color: Colors.black, width: 3), // Thicker border on the right for 3D effect
-      bottom: BorderSide(color: Colors.black, width: 3), // Thicker border on the bottom for 3D effect
+                              right: BorderSide(
+                                  color: Colors.black,
+                                  width:
+                                      2), // Thicker border on the right for 3D effect
+                              bottom: BorderSide(
+                                  color: Colors.black,
+                                  width:
+                                      2), // Thicker border on the bottom for 3D effect
     ),
     boxShadow: [
       BoxShadow(
@@ -368,7 +381,7 @@ int get totalPages {
         style: ElevatedButton.styleFrom(
           primary: Colors.white, // Button background color
           onPrimary: Colors.blue, // Text and icon color
-          elevation: 5, // Add shadow
+                                            elevation: 3, // Add shadow
           shadowColor: Colors.blueAccent.withOpacity(1), // Shadow color with opacity
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10), // Rounded corners
@@ -409,7 +422,7 @@ int get totalPages {
         style: ElevatedButton.styleFrom(
           primary: Colors.white, // Button background color
           onPrimary: Colors.red, // Text and icon color
-          elevation: 5, // Add shadow
+                                              elevation: 3, // Add shadow
           shadowColor: Colors.redAccent.withOpacity(1), // Shadow color with opacity
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10), // Rounded corners

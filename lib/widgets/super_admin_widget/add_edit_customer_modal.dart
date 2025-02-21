@@ -384,9 +384,15 @@ Widget _buildStyledDropdown({
       value: value,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.grey),
+          labelStyle: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white // Use dark theme color
+                : Colors.grey,
+          ), // Label color remains grey
         filled: true,
-        fillColor: Colors.grey[100],
+          fillColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[400] // Use dark theme color
+              : Colors.grey[300], // Background color
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
           borderSide: BorderSide.none,
@@ -399,12 +405,29 @@ Widget _buildStyledDropdown({
           borderRadius: BorderRadius.circular(10.0),
           borderSide: BorderSide.none,
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         errorStyle: const TextStyle(height: 1, color: Colors.red),
       ),
       items: items,
       onChanged: onChanged,
+        style: TextStyle(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey // Grey text in dark mode
+              : Colors.black, // Black text in light mode
+        ),
+        hint: Text(
+          "Select $label",
+          style: TextStyle(
+            color: Colors.grey, // Ensure hint text is grey in both modes
+          ),
+        ),
+        icon: Icon(
+          Icons.arrow_drop_down, // Default dropdown arrow icon
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey // Grey arrow in dark mode
+              : Colors.black, // Black arrow in light mode
+        ),
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Please select a $label';
@@ -414,6 +437,8 @@ Widget _buildStyledDropdown({
     ),
   );
 }
+
+
 
 
 
@@ -435,6 +460,11 @@ Widget _buildAddressRow(int index) {
               initialValue: address['AddressLine'].toString(),
               decoration: InputDecoration(
                 labelText: "Address Line",
+                labelStyle: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey // Use dark theme color
+                      : Colors.grey,
+                ),  
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 border: OutlineInputBorder(
@@ -467,6 +497,11 @@ Widget _buildAddressRow(int index) {
                     initialValue: address['City'].toString(),
                     decoration: InputDecoration(
                       labelText: "City",
+                      labelStyle: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey // Use dark theme color
+                            : Colors.grey,
+                      ),  
                       contentPadding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 16),
                       border: OutlineInputBorder(
@@ -492,6 +527,11 @@ Widget _buildAddressRow(int index) {
                     initialValue: address['PostalCode'].toString(),
                     decoration: InputDecoration(
                       labelText: "Postal Code",
+                      labelStyle: TextStyle(
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.grey // Use dark theme color
+                            : Colors.grey,
+                      ),  
                       contentPadding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 16),
                       border: OutlineInputBorder(
@@ -520,6 +560,11 @@ Widget _buildAddressRow(int index) {
               initialValue: address['Country'].toString(),
               decoration: InputDecoration(
                 labelText: "Country",
+                labelStyle: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey // Use dark theme color
+                      : Colors.grey,
+                ),  
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 border: OutlineInputBorder(
@@ -655,7 +700,10 @@ _buildStyledDropdown(label: 'Price Type',
                   height: 40.0,
                   child: ElevatedButton(
                     onPressed: _submitCustomer,
-                    child: Text(widget.isEditing ? 'Save Changes' : 'Add Customer'),
+                          child: Text(
+                            widget.isEditing ? 'Save Changes' : 'Add Customer',
+                            style: const TextStyle(color: Colors.white),
+                          ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
@@ -686,65 +734,89 @@ Widget buildPriceField() {
     isNumeric: true, // Since price is a number, we pass isNumeric as true
   );
 }
-
 Widget _buildStyledTextField(TextEditingController controller, String label,
-    {bool isEmail = false, bool isNumeric = false, bool isPassword = false, bool isPhone = false}) {
-  return SizedBox(
-    height: 60, // Increased height to accommodate error text without affecting layout
-    child: TextFormField(
-      controller: controller,
-      keyboardType: isEmail
-          ? TextInputType.emailAddress
-          : isNumeric
-              ? TextInputType.number
-              : isPhone
-                  ? TextInputType.phone
-                  : TextInputType.text,
-      obscureText: isPassword,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.grey),
-        filled: true,
-        fillColor: Colors.grey[100],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-        // Reserve space for error messages
-        
-        errorStyle: const TextStyle(height: 1, color: Colors.red), // Consistent height
-      ),
-      validator: (value) {
-        if (value?.isEmpty ?? true) {
-          return 'Please enter a $label';
-        }
+      {bool isEmail = false,
+      bool isNumeric = false,
+      bool isPassword = false,
+      bool isPhone = false}) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        String? errorText;
 
-        if (isEmail && !RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").hasMatch(value!)) {
-          return 'Please enter a valid email';
-        }
+        return SizedBox(
+          height: 60,
+          child: TextFormField(
+            controller: controller,
+            keyboardType: isEmail
+                ? TextInputType.emailAddress
+                : isNumeric
+                    ? TextInputType.number
+                    : isPhone
+                        ? TextInputType.phone
+                        : TextInputType.text,
+            obscureText: isPassword,
+            style: const TextStyle(color: Colors.black),
+            decoration: InputDecoration(
+              labelText: label,
+              labelStyle: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.grey,
+              ),
+              filled: true,
+              fillColor: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[400]
+                  : Colors.grey[300],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+              errorStyle: const TextStyle(height: 1, color: Colors.red),
+              errorText: errorText,
+            ),
+            onChanged: (value) {
+              setState(() =>
+                  errorText = null); // Clear error when user starts typing
+            },
+            validator: (value) {
+              if (value?.isEmpty ?? true) {
+                setState(() => errorText = 'Please enter a $label');
+                return errorText;
+              }
 
-        if (label == 'Password' && value!.length < 8) {
-          return 'Password must be at least 8 characters';
-        }
+              if (isEmail &&
+                  !RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+                      .hasMatch(value!)) {
+                setState(() => errorText = 'Please enter a valid email');
+                return errorText;
+              }
 
-        if (isPhone && !RegExp(r"^03\d{9}$").hasMatch(value!)) {
-          return 'Please enter 11 digits';
-        }
+              if (label == 'Password' && value!.length < 8) {
+                setState(
+                    () => errorText = 'Password must be at least 8 characters');
+                return errorText;
+              }
 
-        return null;
+              if (isPhone && !RegExp(r"^03\d{9}$").hasMatch(value!)) {
+                setState(() => errorText = 'Please enter 11 digits');
+                return errorText;
+              }
+
+              return null;
+            },
+          ),
+        );
       },
-    ),
-
-    
   );
 }
 

@@ -46,10 +46,19 @@ dependencies:
   table_calendar: ^3.1.3
   fluttertoast: ^8.2.5
   flutter_animate: ^4.5.2
+  flutter_launcher_icons: ^0.13.1
+  flutter_riverpod: ^2.4.10
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/Icons/ItunesArtwork@2x.png"  
+  background_color: "#FFFFFF"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

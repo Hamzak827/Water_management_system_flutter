@@ -615,8 +615,12 @@ Future<bool> updateOrderData(String orderId, Map<String, dynamic> orderData) asy
 
  if (response.statusCode == 200) {
       return true;
-    }  else {
-      throw Exception('Failed to update order: ${response.body}');
+      } else if (response.statusCode == 400) {
+        throw Exception('Bad Request: Invalid data sent');
+      } else if (response.statusCode == 500) {
+        throw Exception('This Serial number is out of the valid range');
+      } else {
+        throw Exception('Failed to update customer data: ${response.body}');
     }
   } on SocketException {
     throw Exception('No internet connection');

@@ -118,7 +118,8 @@ class _DeliveryboyOrderScreenState extends State<DeliveryboyOrderScreen> {
         _searchQuery.isEmpty ? orders.length : filteredDeliveryboyOrders.length;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Deliveryboy Orders"),
+        title: Text("Deliveryboy Orders",
+            style: GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       drawer: Sidebar(
@@ -167,6 +168,9 @@ class _DeliveryboyOrderScreenState extends State<DeliveryboyOrderScreen> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search by name, order ID, or status...',
+                      hintStyle:
+                          GoogleFonts.lato(fontSize: 16, color: Colors.black54),
+      
                       prefixIcon: Icon(Icons.search),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -199,11 +203,11 @@ class _DeliveryboyOrderScreenState extends State<DeliveryboyOrderScreen> {
                               right: BorderSide(
                                   color: Colors.black,
                                   width:
-                                      3), // Thicker border on the right for 3D effect
+                                      2), // Thicker border on the right for 3D effect
                               bottom: BorderSide(
                                   color: Colors.black,
                                   width:
-                                      3), // Thicker border on the bottom for 3D effect
+                                      2), // Thicker border on the bottom for 3D effect
                             ),
                             boxShadow: [
                               BoxShadow(
@@ -322,7 +326,9 @@ class _DeliveryboyOrderScreenState extends State<DeliveryboyOrderScreen> {
                                                               decoration:
                                                                   BoxDecoration(
                                                                 color: _getStatusColor(
-                                                                    status), // Set background color
+                                                                        status)
+                                                                    .withOpacity(
+                                                                        0.2), // Set background color
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
@@ -333,8 +339,8 @@ class _DeliveryboyOrderScreenState extends State<DeliveryboyOrderScreen> {
                                                                 style:
                                                                     TextStyle(
                                                                   fontSize: 14,
-                                                                  color: Colors
-                                                                      .white, // White text for better contrast
+                                                                  color: _getStatusColor(
+                                                                      status), // White text for better contrast
                                                                 ),
                                                               ),
                                                             ),
@@ -544,7 +550,7 @@ class _DeliveryboyOrderScreenState extends State<DeliveryboyOrderScreen> {
                                                 .white, // Button background color
                                             onPrimary: Colors
                                                 .green, // Text and icon color
-                                            elevation: 5, // Add shadow
+                                            elevation: 3, // Add shadow
                                             shadowColor: Colors.greenAccent
                                                 .withOpacity(
                                                     1), // Shadow color with opacity

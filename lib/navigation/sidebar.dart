@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:water_management_system/providers/auth_provider.dart';
-import 'package:water_management_system/services/auth_service.dart';
+import 'package:water_management_system/providers/theme_provider.dart';
 
 class Sidebar extends StatelessWidget {
-  final String role; // User role
-  final Function(String) onMenuItemClicked; // Callback for menu item click
-   final AuthProvider _authProvider = AuthProvider();
+  final String role;
+  final Function(String) onMenuItemClicked;
+  final AuthProvider _authProvider = AuthProvider();
 
   Sidebar({required this.role, required this.onMenuItemClicked});
 
@@ -35,101 +37,202 @@ class Sidebar extends StatelessWidget {
     ],
   };
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
-    // Get the menu items for the current role
     List<Map<String, dynamic>> roleMenuItems = menuItems[role] ?? [];
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
 
-    return Drawer(
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 1000),
-        curve: Curves.decelerate,
-        color: Colors.white, // Sidebar color
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            // Sidebar header
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return SizedBox(
+      width: 270, // Adjust this value for the desired width
+      child: Drawer(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(30),
+            bottomRight: Radius.circular(30),
+          ),
+        ),
+        child: Container(
+          color: Theme.of(context).colorScheme.surface, // Use theme-based color
+          child: Column(
+            children: [
+              SizedBox(height: 70),
+              Row(
                 children: [
+                  SizedBox(width: 10),
                   CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.person,
-                      size: 40,
-                      color: Colors.blue,
-                    ),
+                    radius: 20,
+                    backgroundColor: Colors.blue,
+                    child:
+                        Icon(Icons.water_drop, size: 30, color: Colors.white),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(width: 10),
                   Text(
-                    '$role Dashboard',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
+                    'Water Management System',
+                    style: GoogleFonts.lato(
+                      fontSize: 17,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface, // Use theme-based color
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
-            ),
+              SizedBox(height: 15),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                child: Divider(
+                  color:
+                      Theme.of(context).dividerColor, // Use theme-based color
+                  thickness: 1,
+                ),
+              ),
 
-            // Sidebar menu items
-            ...roleMenuItems.map((item) {
-              return ListTile(
-                leading: Icon(item['icon'], color: Colors.black),
-                title: Text(item['title']),
-                onTap: () => onMenuItemClicked(item['route']),
-              );
-            }).toList(),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    ...roleMenuItems.map((item) {
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 30),
+                        child: ListTile(
+                          leading: Icon(
+                            item['icon'],
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface, // Use theme-based color
+                            size: 22,
+                          ),
+                          title: Text(
+                            item['title'],
+                            style: GoogleFonts.roboto(
+                              fontSize: 15,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface, // Use theme-based color
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          minLeadingWidth: 0,
+                          contentPadding:
+                              EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+                          dense: true,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          onTap: () => onMenuItemClicked(item['route']),
+                        ),
+                      );
+                    }).toList(),
 
-            // Logout option (common for all roles)
-            Divider(),
-            ListTile(
-  leading: Icon(Icons.logout, color: Colors.black),
-  title: Text('Logout'),
-  onTap: () async {
-    bool confirmLogout = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Confirm Logout"),
-          content: Text("Are you sure you want to log out?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false); // Cancel logout
-              },
-              child: Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true); // Confirm logout
-              },
-               child: Text("Logout", style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
-    );
+                    // Dark/Light Mode Toggle
 
-    if (confirmLogout == true) {
-      await _authProvider.logout(); // Clear user session
-      Navigator.pop(context); // Close the sidebar
-      Navigator.pushReplacementNamed(context, '/login-screen');
-    }
-  },
-),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 30),
+                      child: ListTile(
+                        leading: Icon(
+                          themeNotifier.themeMode == ThemeMode.dark
+                              ? Icons.nightlight_round
+                              : Icons.wb_sunny,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface, // Use theme-based color
+                          size: 22,
+                        ),
+                        title: Text(
+                          themeNotifier.themeMode == ThemeMode.dark
+                              ? 'Dark Mode'
+                              : 'Light Mode',
+                          style: GoogleFonts.roboto(
+                            fontSize: 15,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface, // Use theme-based color
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        trailing: Switch(
+                          value: themeNotifier.themeMode == ThemeMode.dark,
+                          onChanged: (value) {
+                            themeNotifier.toggleTheme();
+                          },
+                          activeColor: Colors.blue, // Customize switch color
+                        ),
+                        minLeadingWidth: 0,
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 1, horizontal: 5),
+                        dense: true,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                child: Divider(
+                  color:
+                      Theme.of(context).dividerColor, // Use theme-based color
+                  thickness: 1,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20, left: 10, right: 10),
+                child: ListTile(
+                  leading: Icon(
+                    Icons.logout,
+                    color: Colors.redAccent,
+                    size: 22,
+                  ),
+                  title: Text(
+                    'Logout',
+                    style: GoogleFonts.roboto(
+                      fontSize: 15,
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  onTap: () async {
+                    bool confirmLogout = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Confirm Logout"),
+                          content: Text("Are you sure you want to log out?"),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: Text("Cancel"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(true),
+                              child: Text(
+                                "Logout",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
 
-          ],
+                    if (confirmLogout == true) {
+                      await _authProvider.logout();
+                      Navigator.pop(context);
+                      Navigator.pushReplacementNamed(context, '/login-screen');
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

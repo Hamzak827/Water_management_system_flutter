@@ -87,7 +87,7 @@ class _DeliveredStatusModalState extends State<DeliveredStatusModal> {
             msg: 'Order Delivered',
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.green.withOpacity(0.3),
+            backgroundColor: Colors.green.withOpacity(0.5),
             textColor: Colors.white,
             fontSize: 16.0,
           );
@@ -97,7 +97,7 @@ class _DeliveredStatusModalState extends State<DeliveredStatusModal> {
             msg: 'Failed to delivered order. Please try again.',
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.red.withOpacity(0.3),
+            backgroundColor: Colors.red.withOpacity(0.5),
             textColor: Colors.white,
             fontSize: 16.0,
         );
@@ -108,7 +108,7 @@ class _DeliveredStatusModalState extends State<DeliveredStatusModal> {
           msg: e.toString().replaceAll('Exception: ', ''),
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.red.withOpacity(0.3),
+          backgroundColor: Colors.red.withOpacity(0.5),
           textColor: Colors.white,
           fontSize: 16.0,
         );
@@ -131,7 +131,7 @@ class _DeliveredStatusModalState extends State<DeliveredStatusModal> {
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: Colors.grey[200],
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -144,9 +144,17 @@ class _DeliveredStatusModalState extends State<DeliveredStatusModal> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text("Delivered Status"),
-      content: SingleChildScrollView(
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Add Order"),
+          leading: IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => Navigator.pop(context), // Close the dialog
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
         child: Form(
           key: _formKey,
           child: Column(
@@ -167,15 +175,34 @@ class _DeliveredStatusModalState extends State<DeliveredStatusModal> {
               Text("Serial Numbers", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 5),
 
+          
+
               Column(
-                children: List.generate(_serialNumberControllers.length, (index) {
-                  return Row(
+                    children:
+                        List.generate(_serialNumberControllers.length, (index) {
+                      return Column(
                     children: [
-                      Expanded(child: _buildStyledTextField(_serialNumberControllers[index], "Serial Number")),
-                      IconButton(
-                        icon: const Icon(Icons.remove_circle, color: Colors.red),
-                        onPressed: () => _removeSerialNumberField(index),
-                      ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildStyledTextField(
+                                  _serialNumberControllers[index],
+                                  "Serial Number",
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.remove_circle,
+                                    color: Colors.red),
+                                onPressed: () =>
+                                    _removeSerialNumberField(index),
+                              ),
+                            ],
+                          ),
+                          // Add vertical spacing between serial number fields
+                          if (index <
+                              _serialNumberControllers.length -
+                                  1) // Avoid adding space after the last field
+                            const SizedBox(height: 10),
                     ],
                   );
                 }),
@@ -203,7 +230,9 @@ class _DeliveredStatusModalState extends State<DeliveredStatusModal> {
           ),
         ),
       ),
-    );
+
+        ));
+    
   }
 
   Widget _buildInfoRow(String label, String value) {

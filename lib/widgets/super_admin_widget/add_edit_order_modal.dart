@@ -410,7 +410,7 @@ Widget _buildStyledTextField(
         labelText: label,
         labelStyle: const TextStyle(color: Colors.grey),
         filled: true,
-        fillColor: Colors.grey[100],
+          fillColor: Colors.grey[200],
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
           borderSide: BorderSide.none,
@@ -461,7 +461,7 @@ Widget _buildStyledTextField(
           labelText: label,
           labelStyle: const TextStyle(color: Colors.grey),
           filled: true,
-          fillColor: Colors.grey[100],
+          fillColor: Colors.grey[200],
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
             borderSide: BorderSide.none,
@@ -559,15 +559,13 @@ InputDecoration _bottleFieldDecoration(String label) {
 
 
 
-  
-@override
+  @override
 Widget build(BuildContext context) {
-
-if (isLoading) {
-      return Center(child: CircularProgressIndicator()); // Show loading indicator while data is being fetched
+    if (isLoading) {
+      return Center(
+          child:
+              CircularProgressIndicator()); // Show loading indicator while data is being fetched
     }
-
-
 
   return Scaffold(
     appBar: AppBar(
@@ -587,99 +585,96 @@ if (isLoading) {
             children: [
               const SizedBox(height: 20),
 
+                // Customer Dropdown
+                _buildStyledDropdown(
+                  label: 'Customer',
+                  value: customers.any((customer) =>
+                          customer['CustomerID'].toString() ==
+                          selectedCustomerId)
+                      ? selectedCustomerId
+                      : null,
+                  items: customers.map((customer) {
+                    return DropdownMenuItem<String>(
+                      value: customer['CustomerID'].toString(),
+                      child: Text(customer['Name'] ?? ''),
+                    );
+                  }).toList(),
+                  onChanged: _isCustomerAndAddressEditable()
+                      ? (value) {
+                          setState(() {
+                            selectedCustomerId = value;
+                            _onCustomerChanged(value);
+                          });
+                        }
+                      : null,
+                ),
 
-        // Customer Dropdown
-   
+                // Address Dropdown
+                _buildStyledDropdown(
+                  label: 'Address',
+                  value: addresses
+                          .any((address) => address['_id'] == selectedAddressId)
+                      ? selectedAddressId
+                      : null,
+                  items: addresses.map((address) {
+                    // Truncate the address if it's more than one line
+                    String truncatedAddress = address['AddressLine'].length > 20
+                        ? '${address['AddressLine'].substring(0, 20)}...'
+                        : address['AddressLine'];
 
-// In your dropdown widgets
-_buildStyledDropdown(
-  label: 'Customer',
-  value: customers.any((customer) => 
-          customer['CustomerID'].toString() == selectedCustomerId)
-      ? selectedCustomerId
-      : null,
-  items: customers.map((customer) {
-    return DropdownMenuItem<String>(
-      value: customer['CustomerID'].toString(),
-      child: Text(customer['Name'] ?? ''),
-    );
-  }).toList(),
-  onChanged: _isCustomerAndAddressEditable()
-      ? (value) {
-          setState(() {
-            selectedCustomerId = value;
-            _onCustomerChanged(value);
-          });
-        }
-      : null,
-),
+                    return DropdownMenuItem<String>(
+                      value: address['_id'],
+                      child: Text('$truncatedAddress, ${address['City']}'),
+                    );
+                  }).toList(),
+                  onChanged: _isCustomerAndAddressEditable()
+                      ? (value) {
+                          setState(() {
+                            selectedAddressId = value;
+                          });
+                        }
+                      : null,
+                ),
 
-_buildStyledDropdown(
-  label: 'Address',
-  value: addresses.any((address) => 
-          address['_id'] == selectedAddressId)
-      ? selectedAddressId
-      : null,
-  items: addresses.map((address) {
-    return DropdownMenuItem<String>(
-      value: address['_id'],
-      child: Text('${address['AddressLine']}, ${address['City']}'),
-    );
-  }).toList(),
-  onChanged: _isCustomerAndAddressEditable()
-      ? (value) {
-          setState(() {
-            selectedAddressId = value;
-          });
-        }
-      : null,
-),
+                // Delivery Boy Dropdown
+                _buildStyledDropdown(
+                  label: 'Delivery Boy',
+                  value: deliveryBoys.any((deliveryBoy) =>
+                          deliveryBoy['DeliveryBoyID'].toString() ==
+                          selectedDeliveryBoyId)
+                      ? selectedDeliveryBoyId
+                      : null,
+                  items: deliveryBoys.map((deliveryBoy) {
+                    return DropdownMenuItem<String>(
+                      value: deliveryBoy['DeliveryBoyID'].toString(),
+                      child: Text(deliveryBoy['Name'] ?? ''),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedDeliveryBoyId = value;
+                    });
+                  },
+                ),
 
-// Delivery Boy Dropdown
-_buildStyledDropdown(
-              label: 'Delivery Boy',
-              value: deliveryBoys.any((deliveryBoy) =>
-                      deliveryBoy['DeliveryBoyID'].toString() ==
-                      selectedDeliveryBoyId)
-                  ? selectedDeliveryBoyId
-                  : null,
-              items: deliveryBoys.map((deliveryBoy) {
-                return DropdownMenuItem<String>(
-                  value: deliveryBoy['DeliveryBoyID'].toString(),
-                  child: Text(deliveryBoy['Name'] ?? ''),
-                );
-              }).toList(),
-              onChanged:  (value) {
-                      setState(() {
-                        selectedDeliveryBoyId = value;
-                      });
-                    }
-                  
-            ),
-
-
-
-
-
-
-
-              // Input Fields with Enhanced Styling
-              //_buildStyledTextField(_deliverydateController, 'Delivery Date',enabled: _isDeliveryDateEditable(),),
-  _buildStyledTextField(
-  _deliverydateController,
-  'Delivery Date',
-  enabled: _isDeliveryDateEditable(),
-  isDateField: true, // Enable calendar icon for date picker
-),
+                // Input Fields with Enhanced Styling
+                _buildStyledTextField(
+                  _deliverydateController,
+                  'Delivery Date',
+                  enabled: _isDeliveryDateEditable(),
+                  isDateField: true, // Enable calendar icon for date picker
+                ),
 
               const SizedBox(height: 5),
-              _buildStyledTextField(_collectedamountController, 'Collected Amount',),
+                _buildStyledTextField(
+                    _collectedamountController, 'Collected Amount'),
               const SizedBox(height: 3),
-              _buildStyledTextField(_collectedbottlesController, 'Collected Bottles', ),
+                _buildStyledTextField(
+                    _collectedbottlesController, 'Collected Bottles'),
               const SizedBox(height: 3),
 
               _buildStatusDropdown(),
-             
+
                 const SizedBox(height: 20),
                 const Text("Bottles:"),
                 ListView.builder(
@@ -687,12 +682,17 @@ _buildStyledDropdown(
                   itemCount: bottles.length,
                   itemBuilder: (context, index) => _buildBottleRow(index),
                 ),
+
+                // Conditionally show/hide the "Add Bottle" button
+                if (isPricePerLiter)
                 TextButton.icon(
-  onPressed: isPricePerLiter ? _addBottle : null,
-  icon: const Icon(Icons.add),
-  label: const Text("Add Bottle"),
-),
+                    onPressed: _addBottle,
+                    icon: const Icon(Icons.add),
+                    label: const Text("Add Bottle"),
+                  ),
+
                 const SizedBox(height: 20),
+
               // Submit Button
               Center(
                 child: SizedBox(

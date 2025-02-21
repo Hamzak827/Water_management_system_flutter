@@ -325,7 +325,8 @@ void _showUnusedTokensDialog(Map<String, dynamic> token) {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Super Admin Prepaid Tokens"),
+        title: Text("Prepaid Tokens",
+            style: GoogleFonts.lato(fontSize: 20, fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       drawer: Sidebar(
@@ -390,7 +391,22 @@ void _showUnusedTokensDialog(Map<String, dynamic> token) {
                         margin: const EdgeInsets.only(bottom: 10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.black, width: 1),
+                          border: Border(
+                            top: BorderSide(
+                                color: Colors.black,
+                                width: 1), // Normal border on top
+                            left: BorderSide(
+                                color: Colors.black,
+                                width: 1), // Normal border on left
+                            right: BorderSide(
+                                color: Colors.black,
+                                width:
+                                    2), // Thicker border on the right for 3D effect
+                            bottom: BorderSide(
+                                color: Colors.black,
+                                width:
+                                    2), // Thicker border on the bottom for 3D effect
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.1),

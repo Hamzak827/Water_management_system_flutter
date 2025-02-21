@@ -107,7 +107,7 @@ class _CanceledStatusModalState extends State<CanceledStatusModal> {
                 borderRadius: BorderRadius.circular(8.0),
               ),
               filled: true,
-              fillColor: Colors.grey[100],
+              fillColor: Colors.grey[200],
             ),
           ),
           SizedBox(height: 20),
